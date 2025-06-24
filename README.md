@@ -25,7 +25,7 @@
   - 어드레서블 연동도 고려 중
 - **풀 상태 실시간 디버깅(에디터 지원)**
   - 체이닝 메서드를 통해 실시간 로그 확인 가능
-  - `Get().OnDebug(string)`, `Get().ReturnAfter.OnDebugReturn(string)`, `Return().OnDebug(string)` 
+  - `Get().OnDebug(string)`, `Get().ReturnAfter(float)_.OnDebugReturn(string)`, `Return().OnDebug(string)` 
   - 인스펙터에서 풀 상태 확인가능, 검색 지원
 - **GC 0B 유지**
   - 초당 1000개 생성/반환 테스트에서도 GarbageCollector 안뜸
@@ -158,7 +158,7 @@ public interface IPooledObject
 }
 ```
 ---
-#### OnCreatePool
+#### OnCreateFromPool
 - 오브젝트가 풀에서 꺼내질 때 호출
 - 생성 직후 초기화, UI리셋, 트리거 복원 등의 용도로 사용
 ```cs
@@ -196,7 +196,7 @@ void IPooledObject.OnReturnPool()
 자동 반환 메서드를 통해 코드를 더욱 간결하게 만들고, 풀 상태를 로그로 출력 가능
 체이닝 메서드를 통해 사용 가능
 #### ReturnAfter(float)
-일정 시간 지난 후 자동으로 풀에 반환. 코루틴 없이 간단하게 지연 반환 가능
+일정 시간 지난 후 자동으로 풀에 반환. 코루틴 없이도 간단하게 지연 반환 가능
 ```cs
 ObjectPool.Get(prefab).ReturnAfter(3f);
 ```
