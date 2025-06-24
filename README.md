@@ -1,4 +1,4 @@
-# NSJ\_EasyPoolKit
+# AutoPool
 
 A lightweight and easy-to-use object pooling utility for Unity.
 
@@ -308,7 +308,7 @@ Feel free to contribute or open issues on GitHub!
 
 
 
-# NSJ_EasyPoolKit
+# AutoPool
 
 유니티에서 오브젝트 풀링을 간단하고 빠르게 구현하기 위해 만든 툴
 
