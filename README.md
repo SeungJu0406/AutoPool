@@ -1,3 +1,313 @@
+# NSJ\_EasyPoolKit
+
+A lightweight and easy-to-use object pooling utility for Unity.
+
+Object pooling in Unity often requires manual prefab registration, initialization logic, and tedious return handling. This tool is designed to streamline all of that, letting you implement pooling logic in just a few lines.
+
+NSJ\_EasyPoolKit is built with simplicity and reusability in mind, and can be dropped into most Unity projects with zero customization.
+
+---
+
+## Features
+
+* **Extremely simple usage**
+
+  * Just `ObjectPool.Get()` and `ObjectPool.Return()`
+  * No need to pre-register prefabs
+  * `Get()` supports same arguments as `Instantiate()`
+  * Generic return type for `Component` is supported
+
+* **Automatic Return Support**
+
+  * Chainable method for scheduling return after delay
+  * `ObjectPool.Get().ReturnAfter(seconds)`
+
+* **Safe handling of Rigidbody objects**
+
+  * Automatically resets velocity and toggles `WakeUp` / `Sleep` states
+
+* **Resources-based loading**
+
+  * Use `ResourcesPool.Get("path")` with string-based prefab paths
+  * Addressables support under consideration
+
+* **Real-time pool state debugging (Editor supported)**
+
+  * Chainable logging: `OnDebug()`, `OnDebugReturn()`, etc.
+  * Inspector interface shows active pools, supports search & sorting
+
+* **Zero Garbage Allocations (GC 0B)**
+
+  * Verified under high-frequency spawn/return (1000 objects/sec)
+
+---
+
+## Installation
+
+### 1. **.unitypackage**
+
+* Download `.unitypackage` from [Releases](https://github.com/SeungJu0406/NSJ_EasyPoolKit/releases)
+* Import into your Unity project via `Assets > Import Package > Custom Package`
+
+### 2. **Zip File**
+
+* Download ZIP via GitHub Code menu
+* Extract and place in your project's `Assets/` folder
+
+---
+
+## Core APIs
+
+### ✨ Manual Pool Control
+
+Provides API to manually preload, clear, or inspect specific pools.
+
+#### SetPreload
+
+```csharp
+ObjectPool.SetPreload(prefab, count);
+ResourcesPool.SetPreload("PrefabPath", count);
+```
+
+* Preloads up to `count` instances of the specified prefab
+* If the pool already contains more than `count`, this call is ignored
+* All objects are inactive and stored in pool
+
+#### ClearPool
+
+```csharp
+ObjectPool.ClearPool(prefab);
+ResourcesPool.ClearPreload("PrefabPath");
+```
+
+* Empties the pool for the given prefab
+* All pooled objects are destroyed
+* Pool will automatically recreate on next usage
+
+#### GetInfo
+
+```csharp
+var info = ObjectPool.GetInfo(prefab);
+var info = ResourcesPool.GetInfo("PrefabPath");
+```
+
+* Retrieves pool status for the specified prefab
+
+Key properties:
+
+```csharp
+info.PoolCount     // Total objects in pool
+info.ActiveCount   // Currently active objects
+info.Name          // Prefab name
+```
+
+---
+
+### ✨ ObjectPool.Get API
+
+Retrieves objects from the pool based on prefab. Supports position, rotation, transform parent, and generic type return.
+
+#### 1. Basic GameObject return
+
+```csharp
+var instance = ObjectPool.Get(prefab);
+```
+
+* Pulls from pool or instantiates new if empty
+
+#### 2. With Transform parent
+
+```csharp
+var instance = ObjectPool.Get(prefab, transform, worldPositionStay);
+```
+
+* Assigns as child of given transform
+* Maintains world position if `worldPositionStay` is true
+
+#### 3. With position and rotation
+
+```csharp
+var instance = ObjectPool.Get(prefab, position, rotation);
+```
+
+* Places object at specified location
+
+#### 4. Return as Component
+
+```csharp
+var component = ObjectPool.Get<MyComponent>(prefab);
+```
+
+* Returns specified component from the pooled instance
+
+#### 5. Component + Transform
+
+```csharp
+var component = ObjectPool.Get<MyComponent>(prefab, transform, worldPositionStay);
+```
+
+#### 6. Component + position/rotation
+
+```csharp
+var component = ObjectPool.Get<MyComponent>(prefab, position, rotation);
+```
+
+---
+
+### ⟳ ObjectPool.Return API
+
+Returns pooled objects back for reuse.
+
+#### 1. Return GameObject
+
+```csharp
+ObjectPool.Return(instance);
+```
+
+* Deactivates and resets the object
+* Resets transform, scale, parent
+
+#### 2. Return Component
+
+```csharp
+ObjectPool.Return<MyComponent>(instance);
+```
+
+* Returns component and internally accesses its GameObject
+
+---
+
+### ✨ ResourcesPool API
+
+Load prefabs from Resources folder and pool them with string-based keys.
+
+#### 1. Get GameObject
+
+```csharp
+var instance = ResourcesPool.Get("Prefabs/MyBullet");
+```
+
+#### 2. Get Component
+
+```csharp
+var bullet = ResourcesPool.Get<MyComponent>("Prefabs/MyBullet");
+```
+
+#### 3. Additional overloads
+
+Same as ObjectPool.Get:
+
+```csharp
+ResourcesPool.Get(name, Transform, bool)
+ResourcesPool.Get(name, Vector3, Quaternion)
+ResourcesPool.Get<T>(name, Transform, bool)
+ResourcesPool.Get<T>(name, Vector3, Quaternion)
+```
+
+---
+
+### ⟳ ResourcesPool.Return API
+
+```csharp
+ResourcesPool.Return(instance);
+ResourcesPool.Return<MyComponent>(instance);
+```
+
+Same behavior as `ObjectPool.Return`
+
+---
+
+## 🔧 IPooledObject Interface
+
+Objects can implement `IPooledObject` to receive lifecycle callbacks.
+
+```csharp
+public interface IPooledObject {
+  void OnCreateFromPool();
+  void OnReturnToPool();
+}
+```
+
+Example:
+
+```csharp
+public class Bullet : MonoBehaviour, IPooledObject {
+  public void OnCreateFromPool() {
+    health = maxHealth;
+  }
+
+  public void OnReturnToPool() {
+    StopAllCoroutines();
+    trailRenderer.Clear();
+  }
+}
+```
+
+---
+
+## 🌟 PoolExtensions (Utility)
+
+Extension methods to simplify pooling behavior and debugging.
+
+#### ReturnAfter
+
+```csharp
+ObjectPool.Get(prefab).ReturnAfter(3f);
+```
+
+#### OnDebug()
+
+```csharp
+ObjectPool.Get(prefab).OnDebug("Created bullet");
+```
+
+```
+[Pool] Bullet (Active: 1 / 10)
+[Log]: Created bullet
+```
+
+#### OnDebugReturn()
+
+```csharp
+ObjectPool.Get(prefab).ReturnAfter(1.5f).OnDebugReturn("Bullet expired");
+```
+
+#### OnDebug(IPoolInfoReadOnly)
+
+```csharp
+var info = ObjectPool.Return(instance);
+info.OnDebug("Returned bullet");
+```
+
+---
+
+## 🤖 MockObjectPool for Testing
+
+Use mock pool for testing/debugging without spawning real GameObjects.
+
+#### Enable Mock Mode
+
+```csharp
+ObjectPool.SetMock();
+```
+
+#### Restore Real Pool
+
+```csharp
+ObjectPool.SetReal();
+```
+
+Mock mode outputs log statements instead of instantiating real objects. All core APIs work identically.
+
+---
+
+Feel free to contribute or open issues on GitHub!
+
+
+---
+
+
+
 # NSJ_EasyPoolKit
 
 유니티에서 오브젝트 풀링을 간단하고 빠르게 구현하기 위해 만든 툴
@@ -34,12 +344,49 @@
 
 ### 1. **.unitypackage**
 - Release 에서 첨부된 `.unitypackage` 파일 다운로드 후 Unity에서 `Import Package > Custom Package` 로 설치
+- https://github.com/SeungJu0406/NSJ_EasyPoolKit/releases
 
 ### 2. **Zip**
 - Code → Dounload Zip 으로 파일 다운로드 이 후 프로젝트 Assets 폴더에 적용
 
 ## 주요 함수
-## ObjectPool.Get API
+### ✨ 풀 수동 제어 API
+풀을 사전에 생성하거나, 비우거나, 상태를 조회할 수 있는 수동 제어 API
+
+#### SetPreload
+```cs
+ObjectPool.SerPreload(prefab, count);
+ResourcesPool.SerPreload("Prefab", count);
+```
+- 지정된 프리팹에 대한 `count` 개수 만큼 미리 생성
+- 현재 풀에 존재하는 수보다 적을 경우 무시 됨
+- 오브젝트는 비활성화 된 상태로 풀에 저장
+---
+#### ClearPool
+```cs
+ObjectPool.ClearPool(prefab);
+ResourcesPool.ClearPreload("Prefab");
+```
+- 지정 프리팹에 대한 풀을 비움
+- 내부 오브젝트는 자동으로 `Destroy()` 처리
+- 해당 프리팹이 다시 사용되면 자동으로 재생성
+
+---
+#### GetInfo
+```cs
+IPoolInfoReadOnly info = ObjectPool.GetInfo(prefab);
+IPoolInfoReadOnly info = ResourcesPool.GetInfo("Prefab);
+```
+- 특정 프리팹에 대한 현재 풀 상태 조회
+**주요 속성**
+```cs
+info.PoolCount    // 총 보유 중인 오브젝트 수
+info.ActiveCount  // 현재 활성화된 오브젝트 수
+info.Name         // 프리팹 이름
+```
+
+---
+### ✨ ObjectPool.Get API
 오브젝트 풀에서 프리팹을 기반으로 오브젝트를 가져오는 API
 컴포넌트 반환이나 위치 지정 등 다양한 형태를 지원함.
 
@@ -85,7 +432,7 @@ T instance = ObjectPool.Get<T>(prefab, position, rotation);
 - 위치와 회전을 직접 지정하여 오브젝트 생성
 - T 타입 컴포넌트를 반환
 ---
-### ObjectPool.Return API
+### ⟳ ObjectPool.Return API
 풀링된 오브젝트를 반환하는 API
 오브젝트는 비활성화되며 풀에 다시 보관됨
 
@@ -104,7 +451,7 @@ ObjectPool.Return<T>(instance);
 ```
 - `GameObject` 타입을 따로 꺼내지 않고 컴포넌트 그대로 반환 가능
 ---
-### ResourcesPool.Get API
+### ✨ ResourcesPool.Get API
 `Resources.Load`를 통해 리소스에서 프리팹을 로드하고, 풀링하여 오브젝트를 가져오는 API
 기본 `Get`계열과 동일하지만, 프리팹을 코드에 직접 참조하지 않고 문자열로 지정 가능
 
@@ -131,7 +478,7 @@ ResourcesPool.Get<T>(string, Vector3, Quaternion)
 ```
 - `Get` 계열과 동일한 방식으로 동작
 ---
-### ResourcesPool.Return API
+### ⟳ ResourcesPool.Return API
 풀링된 Resources 오브젝트를 반환하는 API
 기본 오브젝트 풀 반환과 동일하게 동작
 
@@ -147,7 +494,7 @@ ObjectPool.Return<T>(instance);
 ```
 - `GameObject` 타입을 따로 꺼내지 않고 컴포넌트 그대로 반환 가능
 
-### IPooledObject 인터페이스
+### 🔧 IPooledObject 인터페이스
 풀링된 오브젝트가 풀에 의해 생성 또는 반환될 때 자동으로 호출되는 콜백을 정의하는 인터페이스
 오브젝트 초기화 및 상태 정리를 자동화할 수 있음
 ```cs
@@ -191,7 +538,7 @@ void IPooledObject.OnReturnPool()
     }
 ```
 ---
-### PoolExtensions Utility
+### 🌟 PoolExtensions Utility
 풀링된 오브젝트를 더 쉽게 사용하고, 디버깅을 도와주는 확장 메서드 모음.
 자동 반환 메서드를 통해 코드를 더욱 간결하게 만들고, 풀 상태를 로그로 출력 가능
 체이닝 메서드를 통해 사용 가능
@@ -236,7 +583,7 @@ ObjectPool.Return(instance).OnDebug("ReturnPool Test");
 [Log] : ReturnPool Test
 ```
 ---
-### 테스트용 MockObjectPool
+### 🤖 테스트용 MockObjectPool
 풀링 시스템을 사용하지 않고, 테스트용으로 가짜 오브젝트를 생성해주는 모드
 실제 Instantiate 대신 간단한 GameObject를 만들고 Debug.Log()를 출력
 
