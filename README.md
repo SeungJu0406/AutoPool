@@ -1,5 +1,7 @@
 # AutoPool
 
+![AutoPool_image_160x160](https://github.com/user-attachments/assets/2177670e-36b9-4fc0-9659-fc90578cef43)
+
 A lightweight and easy-to-use object pooling utility for Unity.
 
 Object pooling in Unity often requires manual prefab registration, initialization logic, and tedious return handling. This tool is designed to streamline all of that, letting you implement pooling logic in just a few lines.
