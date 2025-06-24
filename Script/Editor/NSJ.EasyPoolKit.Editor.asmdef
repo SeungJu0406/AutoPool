@@ -1,5 +1,0 @@
-{
-  "name": "NSJ.EasyPoolKit.Editor",
-  "references": [ "NSJ.EasyPoolKit" ],
-  "includePlatforms": [ "Editor" ]
-}

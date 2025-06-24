@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem.UI;
 #endif
-namespace NSJ_EasyPoolKit
+namespace AutoPool
 {
 
     [DefaultExecutionOrder(-999)]

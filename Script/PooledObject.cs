@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace NSJ_EasyPoolKit
+namespace AutoPool
 {
     // This script is part of a Unity Asset Store package.
     // Unauthorized copying, modification, or redistribution of this code is strictly prohibited.
@@ -26,7 +26,7 @@ namespace NSJ_EasyPoolKit
 
         private void OnDisable()
         {
-            if (EasyObjectPool.Instance == null)
+            if (AutoPool.Instance == null)
                 return;
 
             OnReturn?.Invoke();

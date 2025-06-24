@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static NSJ_EasyPoolKit.EasyObjectPool;
+using static AutoPool.AutoPool;
 
-namespace NSJ_EasyPoolKit
+namespace AutoPool
 {
     public class SamplePoolSpawner2 : MonoBehaviour
     {

@@ -3,13 +3,13 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace NSJ_EasyPoolKit
+namespace AutoPool
 {
     // This script is part of a Unity Asset Store package.
     // Unauthorized copying, modification, or redistribution of this code is strictly prohibited.
     // © 2025 NSJ. All rights reserved.
 
-    [CustomEditor(typeof(EasyObjectPool))]
+    [CustomEditor(typeof(AutoPool))]
     public class ObjectPoolEditor : Editor
     {
         enum SortType { Name, ActiveCount }
@@ -22,7 +22,7 @@ namespace NSJ_EasyPoolKit
         {
             DrawDefaultInspector();
 
-            EasyObjectPool pool = (EasyObjectPool)target;
+            AutoPool pool = (AutoPool)target;
 
             GUILayout.Space(10);
             EditorGUILayout.LabelField("Active Pools", EditorStyles.boldLabel);

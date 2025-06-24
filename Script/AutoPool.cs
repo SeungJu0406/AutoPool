@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
-namespace NSJ_EasyPoolKit
+namespace AutoPool
 {
     // This script is part of a Unity Asset Store package.
     // Unauthorized copying, modification, or redistribution of this code is strictly prohibited.
@@ -15,7 +15,7 @@ namespace NSJ_EasyPoolKit
     /// 오브젝트 풀링을 위한 메인 클래스입니다.
     /// 자동 반환, 딜레이 반환, 재사용 가능한 풀 구조를 제공합니다.
     /// </summary>
-    public class EasyObjectPool : MonoBehaviour, IObjectPool
+    public class AutoPool : MonoBehaviour, IObjectPool
     {
         /// <summary>
         /// 풀 오브젝트 최대 유지 시간입니다. 시간이 지나면 자동 비활성화됩니다.
@@ -25,11 +25,11 @@ namespace NSJ_EasyPoolKit
 
         private static bool s_isApplicationQuit = false;
 
-        private static EasyObjectPool _instance;
+        private static AutoPool _instance;
         /// <summary>
-        /// EasyObjectPool 싱글톤 인스턴스입니다. 자동 생성됩니다.
+        /// AutoPool 싱글톤 인스턴스입니다. 자동 생성됩니다.
         /// </summary>
-        public static EasyObjectPool Instance
+        public static AutoPool Instance
         {
             get
             {
@@ -41,7 +41,7 @@ namespace NSJ_EasyPoolKit
             }
         }
 
-        public static EasyObjectPool CreatePool()
+        public static AutoPool CreatePool()
         {
             if (_instance != null)
             {
@@ -51,9 +51,9 @@ namespace NSJ_EasyPoolKit
             {
                 if (s_isApplicationQuit == true)
                     return null;
-                // 새로운 EasyObjectPool GameObject 생성 및 할당
-                GameObject newPool = new GameObject("EasyObjectPool");
-                EasyObjectPool pool = newPool.AddComponent<EasyObjectPool>();
+                // 새로운 AutoPool GameObject 생성 및 할당
+                GameObject newPool = new GameObject("AutoPool");
+                AutoPool pool = newPool.AddComponent<AutoPool>();
                 return pool;
             }
         }

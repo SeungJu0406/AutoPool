@@ -3,7 +3,7 @@ using System.Data;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace NSJ_EasyPoolKit
+namespace AutoPool
 {
     public class MockObjectPool : IObjectPool
     {
