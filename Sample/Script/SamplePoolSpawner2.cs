@@ -8,6 +8,8 @@ namespace NSJ_EasyPoolKit
     {
         [SerializeField] private Button _getButton;
         [SerializeField] private Button _returnButton;
+        [SerializeField] private Button _setPreload;
+        [SerializeField] private InputField _inputField;
         [SerializeField] private Text _text;
 
         [SerializeField] private SampleObject _samplePrefab;
@@ -21,6 +23,15 @@ namespace NSJ_EasyPoolKit
         {
             _getButton.onClick.AddListener(() => GetObject());
             _returnButton.onClick.AddListener(() => ReturnObject());
+            _setPreload.onClick.AddListener(() => SetPreload());
+        }
+
+        private void SetPreload()
+        {
+            int count = int.TryParse(_inputField.text, out int result) ? result : 0;
+            IPoolInfoReadOnly poolInfo = ObjectPool.SetPreload(_samplePrefab, count).OnDebug("SetPreload Test");
+
+            _text.text = $"Active: {poolInfo.ActiveCount} / Total: {poolInfo.PoolCount}";
         }
 
         private void GetObject()

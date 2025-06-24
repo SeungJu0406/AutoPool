@@ -51,22 +51,22 @@ namespace NSJ_EasyPoolKit
             {
                 if (log == default)
                 {
-                    Debug.Log($"[MockGetPool] : {poolInfo.Name}");
+                    Debug.Log($"[MockPool] : {poolInfo.Name}");
                 }
                 else
                 {
-                    Debug.Log($"[MockGetPool] : {poolInfo.Name} \n[Log] : {log}");
+                    Debug.Log($"[MockPool] : {poolInfo.Name} \n[Log] : {log}");
                 }
             }
             else
             {
                 if (log == default)
                 {
-                    Debug.Log($"[GetPool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
+                    Debug.Log($"[Pool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
                 }
                 else
                 {
-                    Debug.Log($"[GetPool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
+                    Debug.Log($"[Pool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
                 }
             }
             return instance;
@@ -100,11 +100,11 @@ namespace NSJ_EasyPoolKit
                 {
                     if (log == default)
                     {
-                        Debug.Log($"[MockReturnPool] {poolInfo.Name}");
+                        Debug.Log($"[MockPool] {poolInfo.Name}");
                     }
                     else
                     {
-                        Debug.Log($"[MockReturnPool] {poolInfo.Name} \n [Log] : {log}");
+                        Debug.Log($"[MockPool] {poolInfo.Name} \n [Log] : {log}");
                     }
                     pooledObject.OnReturn -= callback;
                 };
@@ -115,11 +115,11 @@ namespace NSJ_EasyPoolKit
                 {
                     if (log == default)
                     {
-                        Debug.Log($"[ReturnPool] {poolInfo.Name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
+                        Debug.Log($"[Pool] {poolInfo.Name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
                     }
                     else
                     {
-                        Debug.Log($"[ReturnPool] {poolInfo.Name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
+                        Debug.Log($"[Pool] {poolInfo.Name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
                     }
                     pooledObject.OnReturn -= callback;
                 };
@@ -152,23 +152,23 @@ namespace NSJ_EasyPoolKit
             {
                 if (log == default)
                 {
-                    Debug.Log($"[MockReturnPool] {poolInfo.Name}");
+                    Debug.Log($"[MockPool] {poolInfo.Name}");
                 }
                 else
                 {
-                    Debug.Log($"[MockReturnPool] {poolInfo.Name} \n [Log] : {log}");
+                    Debug.Log($"[MockPool] {poolInfo.Name} \n [Log] : {log}");
                 }
             }
             else
             {
                 if (log == default)
                 {
-                    Debug.Log($"[ReturnPool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
+                    Debug.Log($"[Pool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
                 }
                 else
                 {
 
-                    Debug.Log($"[ReturnPool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
+                    Debug.Log($"[Pool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
                 }
             }
 

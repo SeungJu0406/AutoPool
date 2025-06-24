@@ -167,13 +167,14 @@ namespace NSJ_EasyPoolKit
                 return null;
             }
             // count 수치까지 미리 오브젝트를 생성하고 풀에 추가합니다.
-            while (info.Pool.Count < count)
+            while (info.PoolCount < count)
             {
+                Debug.Log(count);
                 GameObject instance = Instantiate(info.Prefab);
                 PooledObject poolObject = AddPoolObjectComponent(instance, info);
                 instance.transform.SetParent(info.Parent);
                 info.Pool.Push(instance);
-                info.PoolCount++;
+                instance.gameObject.SetActive(false);
             }
             return info;
         }

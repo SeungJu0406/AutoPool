@@ -7,11 +7,28 @@ namespace NSJ_EasyPoolKit
         // This script is part of a Unity Asset Store package.
         // Unauthorized copying, modification, or redistribution of this code is strictly prohibited.
         // © 2025 NSJ. All rights reserved.
+
+        public static void SetMock()
+        {
+            ObjectPool.SetMock();
+        }
+        public static void SetReal()
+        {
+            ObjectPool.SetReal();
+        }
+
+        /// <summary>
+        /// 풀을 미리 정의된 개수만큼 생성합니다. Resources에 저장된 프리팹을 기준으로 합니다.
+        /// Sets the preload count for a specific prefab in the pool using a Resources path.
+        /// </summary>
+        public static IPoolInfoReadOnly SetPreload(string name, int count)
+        {
+            return ObjectPool.SetPreload(name, count);
+        }
         public static GameObject Get(string name, Transform transform)
         {
             return ObjectPool.ResourcesGet(name, transform);
         }
-
         public static GameObject Get(string name)
         {
             return ObjectPool.ResourcesGet(name);
