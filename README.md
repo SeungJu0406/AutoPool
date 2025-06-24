@@ -34,6 +34,7 @@
 
 ### 1. **.unitypackage**
 - Release 에서 첨부된 `.unitypackage` 파일 다운로드 후 Unity에서 `Import Package > Custom Package` 로 설치
+- https://github.com/SeungJu0406/NSJ_EasyPoolKit/releases
 
 ### 2. **Zip**
 - Code → Dounload Zip 으로 파일 다운로드 이 후 프로젝트 Assets 폴더에 적용
