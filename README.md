@@ -25,7 +25,7 @@
   - 어드레서블 연동도 고려 중
 - **풀 상태 실시간 디버깅(에디터 지원)**
   - 체이닝 메서드를 통해 실시간 로그 확인 가능
-  - `Get().OnDebug(string)`, `Get().ReturnAfter.OnDebugReturn(string)`, `Return().OnDebug(string)` 
+  - `Get().OnDebug(string)`, `Get().ReturnAfter(float)_.OnDebugReturn(string)`, `Return().OnDebug(string)` 
   - 인스펙터에서 풀 상태 확인가능, 검색 지원
 - **GC 0B 유지**
   - 초당 1000개 생성/반환 테스트에서도 GarbageCollector 안뜸
@@ -108,7 +108,6 @@ ObjectPool.Return<T>(instance);
 `Resources.Load`를 통해 리소스에서 프리팹을 로드하고, 풀링하여 오브젝트를 가져오는 API
 기본 `Get`계열과 동일하지만, 프리팹을 코드에 직접 참조하지 않고 문자열로 지정 가능
 
----
 #### 1. GameObject 반환
 ```cs
 GameObject instance = ResourcesPool.Get(string);
@@ -136,7 +135,6 @@ ResourcesPool.Get<T>(string, Vector3, Quaternion)
 풀링된 Resources 오브젝트를 반환하는 API
 기본 오브젝트 풀 반환과 동일하게 동작
 
----
 #### 1. 기본 반환(GameObject)
 ```cs
 ResourcesPool.Return(instance);
@@ -149,7 +147,6 @@ ObjectPool.Return<T>(instance);
 ```
 - `GameObject` 타입을 따로 꺼내지 않고 컴포넌트 그대로 반환 가능
 
----
 ### IPooledObject 인터페이스
 풀링된 오브젝트가 풀에 의해 생성 또는 반환될 때 자동으로 호출되는 콜백을 정의하는 인터페이스
 오브젝트 초기화 및 상태 정리를 자동화할 수 있음
@@ -161,7 +158,7 @@ public interface IPooledObject
 }
 ```
 ---
-#### OnCreatePool
+#### OnCreateFromPool
 - 오브젝트가 풀에서 꺼내질 때 호출
 - 생성 직후 초기화, UI리셋, 트리거 복원 등의 용도로 사용
 ```cs
@@ -199,7 +196,7 @@ void IPooledObject.OnReturnPool()
 자동 반환 메서드를 통해 코드를 더욱 간결하게 만들고, 풀 상태를 로그로 출력 가능
 체이닝 메서드를 통해 사용 가능
 #### ReturnAfter(float)
-일정 시간 지난 후 자동으로 풀에 반환. 코루틴 없이 간단하게 지연 반환 가능
+일정 시간 지난 후 자동으로 풀에 반환. 코루틴 없이도 간단하게 지연 반환 가능
 ```cs
 ObjectPool.Get(prefab).ReturnAfter(3f);
 ```
@@ -243,7 +240,6 @@ ObjectPool.Return(instance).OnDebug("ReturnPool Test");
 풀링 시스템을 사용하지 않고, 테스트용으로 가짜 오브젝트를 생성해주는 모드
 실제 Instantiate 대신 간단한 GameObject를 만들고 Debug.Log()를 출력
 
----
 #### 활성화 : SetMock()
 ```cs
 ObjectPool.SetMock();
