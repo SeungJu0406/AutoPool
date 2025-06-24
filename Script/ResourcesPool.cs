@@ -32,7 +32,7 @@ namespace NSJ_EasyPoolKit
         /// </summary>
         public static IPoolInfoReadOnly SetPreload(string name, int count)
         {
-            return ObjectPool.SetResouecesPreload(name, count);
+            return ObjectPool.SetResourcesPreload(name, count);
         }
         public static IPoolInfoReadOnly ClearPreload(string name)
         {

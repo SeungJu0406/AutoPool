@@ -89,7 +89,7 @@ namespace NSJ_EasyPoolKit
         /// 풀을 미리 정의된 개수만큼 생성합니다. Resources에 저장된 프리팹을 기준으로 합니다.
         /// Sets the preload count for a specific prefab in the pool using a Resources path.
         /// </summary>
-        public static IPoolInfoReadOnly SetResouecesPreload(string resouces, int count)
+        public static IPoolInfoReadOnly SetResourcesPreload(string resouces, int count)
         {
             CreatePool();
             return s_objectPool.SetResourcesPreload(resouces, count);
