@@ -9,7 +9,7 @@ namespace NSJ_EasyPoolKit
     // Unauthorized copying, modification, or redistribution of this code is strictly prohibited.
     // © 2025 NSJ. All rights reserved.
 
-    [CustomEditor(typeof(ObjectPool))]
+    [CustomEditor(typeof(EasyObjectPool))]
     public class ObjectPoolEditor : Editor
     {
         enum SortType { Name, ActiveCount }
@@ -22,7 +22,7 @@ namespace NSJ_EasyPoolKit
         {
             DrawDefaultInspector();
 
-            ObjectPool pool = (ObjectPool)target;
+            EasyObjectPool pool = (EasyObjectPool)target;
 
             GUILayout.Space(10);
             EditorGUILayout.LabelField("Active Pools", EditorStyles.boldLabel);

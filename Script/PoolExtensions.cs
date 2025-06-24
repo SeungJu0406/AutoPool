@@ -12,6 +12,8 @@ namespace NSJ_EasyPoolKit
     /// </summary>
     public static class PoolExtensions
     {
+        private static bool _isMock = false;
+
         /// <summary>
         /// 일정 시간(delay) 후 풀로 자동 반환합니다. 반환 전까지는 오브젝트를 사용할 수 있습니다.
         /// </summary>
@@ -43,17 +45,30 @@ namespace NSJ_EasyPoolKit
         public static GameObject OnDebug(this GameObject instance, string log = default)
         {
             PooledObject pooledObject = instance.GetComponent<PooledObject>();
-            ObjectPool.PoolInfo poolInfo = pooledObject.PoolInfo;
+            IPoolInfoReadOnly poolInfo = pooledObject.PoolInfo;
 
-            if (log == default)
+            if (poolInfo.IsMock == true)
             {
-                Debug.Log($"[GetPool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
+                if (log == default)
+                {
+                    Debug.Log($"[MockGetPool] : {poolInfo.Name}");
+                }
+                else
+                {
+                    Debug.Log($"[MockGetPool] : {poolInfo.Name} \n[Log] : {log}");
+                }
             }
             else
             {
-                Debug.Log($"[GetPool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
+                if (log == default)
+                {
+                    Debug.Log($"[GetPool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
+                }
+                else
+                {
+                    Debug.Log($"[GetPool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
+                }
             }
-
             return instance;
         }
 
@@ -73,21 +88,42 @@ namespace NSJ_EasyPoolKit
         public static GameObject OnDebugReturn(this GameObject instance, string log = default)
         {
             PooledObject pooledObject = instance.GetComponent<PooledObject>();
-            ObjectPool.PoolInfo poolInfo = pooledObject.PoolInfo;
+            IPoolInfoReadOnly poolInfo = pooledObject.PoolInfo;
+
+
 
             Action callback = null;
-            callback = () =>
+
+            if (poolInfo.IsMock == true)
             {
-                if (log == default)
+                callback = () =>
                 {
-                    Debug.Log($"[ReturnPool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
-                }
-                else
+                    if (log == default)
+                    {
+                        Debug.Log($"[MockReturnPool] {poolInfo.Name}");
+                    }
+                    else
+                    {
+                        Debug.Log($"[MockReturnPool] {poolInfo.Name} \n [Log] : {log}");
+                    }
+                    pooledObject.OnReturn -= callback;
+                };
+            }
+            else
+            {
+                callback = () =>
                 {
-                    Debug.Log($"[ReturnPool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
-                }
-                pooledObject.OnReturn -= callback;
-            };
+                    if (log == default)
+                    {
+                        Debug.Log($"[ReturnPool] {poolInfo.Name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
+                    }
+                    else
+                    {
+                        Debug.Log($"[ReturnPool] {poolInfo.Name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
+                    }
+                    pooledObject.OnReturn -= callback;
+                };
+            }
 
             pooledObject.OnReturn += callback;
             return instance;
@@ -112,16 +148,30 @@ namespace NSJ_EasyPoolKit
         {
             if(poolInfo == null)
                 return null;
-
-            if (log == default)
+            if(poolInfo.IsMock == true)
             {
-                Debug.Log($"[ReturnPool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
+                if (log == default)
+                {
+                    Debug.Log($"[MockReturnPool] {poolInfo.Name}");
+                }
+                else
+                {
+                    Debug.Log($"[MockReturnPool] {poolInfo.Name} \n [Log] : {log}");
+                }
             }
             else
             {
-           
-                Debug.Log($"[ReturnPool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
+                if (log == default)
+                {
+                    Debug.Log($"[ReturnPool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
+                }
+                else
+                {
+
+                    Debug.Log($"[ReturnPool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
+                }
             }
+
 
             return poolInfo;
         }
@@ -129,6 +179,19 @@ namespace NSJ_EasyPoolKit
         public static T GetOrAddComponent<T>(this GameObject obj) where T : Component
         {
             return obj.TryGetComponent(out T comp) ? comp : obj.AddComponent<T>();
+        }
+
+        public static void SetMockMode(bool isMock)
+        {
+            _isMock = isMock;
+            if (_isMock)
+            {
+                Debug.LogWarning("Mock mode is enabled. This will not use the actual ObjectPool.");
+            }
+            else
+            {
+                Debug.Log("Mock mode is disabled. Using the actual ObjectPool.");
+            }
         }
     }
 }

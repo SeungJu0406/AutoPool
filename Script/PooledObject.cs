@@ -8,7 +8,7 @@ namespace NSJ_EasyPoolKit
     // © 2025 NSJ. All rights reserved.
     public class PooledObject : MonoBehaviour
     {
-        public ObjectPool.PoolInfo PoolInfo;
+        public IPoolInfoReadOnly PoolInfo;
 
         IPooledObject _poolObject;
 
@@ -26,7 +26,7 @@ namespace NSJ_EasyPoolKit
 
         private void OnDisable()
         {
-            if (ObjectPool.Instance == null)
+            if (EasyObjectPool.Instance == null)
                 return;
 
             OnReturn?.Invoke();
