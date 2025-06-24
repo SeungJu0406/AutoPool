@@ -7,21 +7,57 @@ namespace NSJ_EasyPoolKit
 {
     public class MockObjectPool : IObjectPool
     {
+        public IPoolInfoReadOnly GetInfo(GameObject prefab)
+        {
+            return new MockPoolInfo(prefab.name);
+        }
+
+        public IPoolInfoReadOnly GetInfo<T>(T prefab) where T : Component
+        {
+            return new MockPoolInfo(prefab.name);
+        }
+
+        public IPoolInfoReadOnly GetResourcesInfo(string resources)
+        {
+           return new MockPoolInfo(resources);
+        }
+
         public IPoolInfoReadOnly SetPreload(GameObject prefab, int count)
         {
-            Debug.Log("[SetPreload]: " + prefab.name + " with count: " + count);
+            Debug.Log("[SetResourcesPreload]: " + prefab.name + " with count: " + count);
             return new MockPoolInfo(prefab.name);
         }
 
         public IPoolInfoReadOnly SetPreload<T>(T prefab, int count) where T : Component
         {
-            Debug.Log("[SetPreload]: " + prefab.name + " with count: " + count);
+            Debug.Log("[SetResourcesPreload]: " + prefab.name + " with count: " + count);
             return new MockPoolInfo(prefab.name);
         }
 
-        public IPoolInfoReadOnly SetPreload(string resources, int count)
+        public IPoolInfoReadOnly SetResourcesPreload(string resources, int count)
         {
-            Debug.Log("[SetPreload]: " + resources + " with count: " + count);
+            Debug.Log("[SetResourcesPreload]: " + resources + " with count: " + count);
+            return new MockPoolInfo(resources);
+        }
+
+        public IPoolInfoReadOnly ClearPool(GameObject prefab)
+        {
+           Debug.Log($"[ClearPool]: {prefab.name}");
+            // Mocking ClearPool
+            return new MockPoolInfo(prefab.name);
+        }
+
+        public IPoolInfoReadOnly ClearPool<T>(T prefab) where T : Component
+        {
+           Debug.Log($"[ClearPool]: {prefab.name}");
+            // Mocking ClearPool
+            return new MockPoolInfo(prefab.name);
+        }
+
+        public IPoolInfoReadOnly ClearResourcesPool(string resources)
+        {
+           Debug.Log($"[ClearResourcesPool]: {resources}");
+            // Mocking ClearResourcesPool
             return new MockPoolInfo(resources);
         }
 

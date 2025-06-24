@@ -124,7 +124,22 @@ namespace NSJ_EasyPoolKit
             else
                 Destroy(gameObject);
         }
+        #region GetInfo
+        public IPoolInfoReadOnly GetInfo(GameObject prefab)
+        {
+            return FindPool(prefab);
+        }
 
+        public IPoolInfoReadOnly GetInfo<T>(T prefab) where T : Component
+        {
+            return FindPool(prefab.gameObject);
+        }
+
+        public IPoolInfoReadOnly GetResourcesInfo(string resources)
+        {
+            return FindResourcesPool(resources);
+        }
+        #endregion
         #region SePreload
         /// <summary>
         /// 풀을 미리 정의된 개수만큼 생성합니다.
@@ -150,10 +165,31 @@ namespace NSJ_EasyPoolKit
         /// 풀을 미리 정의된 개수만큼 생성합니다. Resources에 저장된 프리팹을 기준으로 합니다.
         /// Sets the preload count for a specific prefab in the pool using a Resources path.
         /// </summary>
-        public IPoolInfoReadOnly SetPreload(string resources, int count)
+        public IPoolInfoReadOnly SetResourcesPreload(string resources, int count)
         {
-            PoolInfo info = FindResourcePool(resources);
+            PoolInfo info = FindResourcesPool(resources);
             return ProcessPreload(info, count);
+        }
+
+        public IPoolInfoReadOnly ClearPool(GameObject prefab)
+        {
+            PoolInfo info = FindPool(prefab);
+            ClearPool(info);
+            return info;
+        }
+
+        public IPoolInfoReadOnly ClearPool<T>(T prefab) where T : Component
+        {
+            PoolInfo info = FindPool(prefab.gameObject);
+            ClearPool(info);
+            return info;
+        }
+
+        public IPoolInfoReadOnly ClearResourcesPool(string resources)
+        {
+            PoolInfo info = FindResourcesPool(resources);
+            ClearPool(info);
+            return info;
         }
         /// <summary>
         /// 풀을 미리 정의된 개수만큼 생성하는 과정의 메서드입니다
@@ -161,7 +197,7 @@ namespace NSJ_EasyPoolKit
         /// </summary>
         private IPoolInfoReadOnly ProcessPreload(PoolInfo info, int count)
         {
-            if(info == null)
+            if (info == null)
             {
                 Debug.LogError("풀 정보가 유효하지 않습니다.");
                 return null;
@@ -169,7 +205,6 @@ namespace NSJ_EasyPoolKit
             // count 수치까지 미리 오브젝트를 생성하고 풀에 추가합니다.
             while (info.PoolCount < count)
             {
-                Debug.Log(count);
                 GameObject instance = Instantiate(info.Prefab);
                 PooledObject poolObject = AddPoolObjectComponent(instance, info);
                 instance.transform.SetParent(info.Parent);
@@ -250,7 +285,7 @@ namespace NSJ_EasyPoolKit
         /// <returns></returns>
         public GameObject ResourcesGet(string resources)
         {
-            PoolInfo info = FindResourcePool(resources);
+            PoolInfo info = FindResourcesPool(resources);
             GameObject instance = ProcessGet(info);
             return instance;
         }
@@ -259,7 +294,7 @@ namespace NSJ_EasyPoolKit
         /// </summary>
         public GameObject ResourcesGet(string resources, Transform transform, bool worldPositionStay = false)
         {
-            PoolInfo info = FindResourcePool(resources);
+            PoolInfo info = FindResourcesPool(resources);
             GameObject instance = ProcessGet(info, transform, worldPositionStay);
             return instance;
         }
@@ -269,7 +304,7 @@ namespace NSJ_EasyPoolKit
         /// </summary>
         public GameObject ResourcesGet(string resources, Vector3 pos, Quaternion rot)
         {
-            PoolInfo info = FindResourcePool(resources);
+            PoolInfo info = FindResourcesPool(resources);
             GameObject instance = ProcessGet(info, pos, rot);
             return instance;
         }
@@ -278,7 +313,7 @@ namespace NSJ_EasyPoolKit
         /// </summary>
         public T ResourcesGet<T>(string resources) where T : Component
         {
-            PoolInfo info = FindResourcePool(resources);
+            PoolInfo info = FindResourcesPool(resources);
             GameObject instance = ProcessGet(info);
             T component = instance.GetComponent<T>();
             return component;
@@ -289,7 +324,7 @@ namespace NSJ_EasyPoolKit
         /// </summary>
         public T ResourcesGet<T>(string resources, Transform transform, bool worldPositionStay = false) where T : Component
         {
-            PoolInfo info = FindResourcePool(resources);
+            PoolInfo info = FindResourcesPool(resources);
             GameObject instance = ProcessGet(info, transform, worldPositionStay);
             T component = instance.GetComponent<T>();
             return component;
@@ -300,7 +335,7 @@ namespace NSJ_EasyPoolKit
         /// </summary>
         public T ResourcesGet<T>(string resources, Vector3 pos, Quaternion rot) where T : Component
         {
-            PoolInfo info = FindResourcePool(resources);
+            PoolInfo info = FindResourcesPool(resources);
             GameObject instance = ProcessGet(info, pos, rot);
             T component = instance.GetComponent<T>();
             return component;
@@ -401,7 +436,7 @@ namespace NSJ_EasyPoolKit
         /// 해당 프리팹에 대한 풀 정보를 찾거나, 없으면 새로 생성합니다.
         /// 프리팹의 인스턴스 ID를 기준으로 Dictionary에서 관리됩니다.
         /// </summary>
-        private PoolInfo FindResourcePool(string resources)
+        private PoolInfo FindResourcesPool(string resources)
         {
             Dictionary<string, int> resourcePool = Instance._resourcesPoolDic;
             PoolInfo pool = default;
@@ -721,11 +756,10 @@ namespace NSJ_EasyPoolKit
                     pool.IsUsed = false;
                     pool.IsActive = true;
                 }
-
                 // 타이머 종료 시 
                 if (timer <= 0)
                 {
-                    ClearPool(id);
+                    ClearPool(Instance._poolDic[id]);
                 }
                 else
                 {
@@ -739,13 +773,8 @@ namespace NSJ_EasyPoolKit
         /// 지정된 ID의 풀을 비우고 비활성화 처리합니다.
         /// OnPoolDormant 이벤트가 있다면 호출됩니다.
         /// </summary>
-        private void ClearPool(int id)
+        private void ClearPool(PoolInfo info)
         {
-            PoolInfo info = Instance._poolDic[id];
-
-            if (info.IsActive == true)
-                return;
-
             info.OnPoolDormant?.Invoke();
 
             info.PoolCount = 0;
@@ -777,6 +806,5 @@ namespace NSJ_EasyPoolKit
         {
             s_isApplicationQuit = true;
         }
-
     }
 }

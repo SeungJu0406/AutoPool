@@ -32,6 +32,41 @@ namespace NSJ_EasyPoolKit
             CreatePool();
         }
         /// <summary>
+        /// 풀의 정보를 가져옵니다.
+        /// Gets the information of the object pool.
+        /// </summary>
+        /// <param name="prefab"></param>
+        /// <returns></returns>
+        public static IPoolInfoReadOnly GetInfo(GameObject prefab)
+        {
+            CreatePool();
+            return s_objectPool.GetInfo(prefab);
+        }
+        /// <summary>
+        /// 풀의 정보를 가져옵니다. 컴포넌트를 타입으로 지정할 수 있습니다.
+        /// Gets the information of the object pool for a specific component type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="prefab"></param>
+        /// <returns></returns>
+        public static IPoolInfoReadOnly GetInfo<T>(T prefab) where T : Component
+        {
+            CreatePool();
+            return s_objectPool.GetInfo(prefab);
+        }
+        /// <summary>
+        /// 풀의 정보를 가져옵니다. Resources에 저장된 프리팹을 기준으로 합니다.
+        /// Gets the information of the object pool for a specific prefab stored in Resources.
+        /// </summary>
+        /// <param name="resources"></param>
+        /// <returns></returns>
+        public static IPoolInfoReadOnly GetResourcesInfo(string resources)
+        {
+            CreatePool();
+            return s_objectPool.GetResourcesInfo(resources);
+        } 
+
+        /// <summary>
         /// 풀을 미리 정의된 개수만큼 생성합니다.
         /// Sets the preload count for a specific prefab in the pool.
         /// </summary>
@@ -54,11 +89,48 @@ namespace NSJ_EasyPoolKit
         /// 풀을 미리 정의된 개수만큼 생성합니다. Resources에 저장된 프리팹을 기준으로 합니다.
         /// Sets the preload count for a specific prefab in the pool using a Resources path.
         /// </summary>
-        public static IPoolInfoReadOnly SetPreload(string resouces, int count)
+        public static IPoolInfoReadOnly SetResouecesPreload(string resouces, int count)
         {
             CreatePool();
-            return s_objectPool.SetPreload(resouces, count);
+            return s_objectPool.SetResourcesPreload(resouces, count);
         }
+
+        /// <summary>
+        /// 풀을 비웁니다. 지정된 프리팹에 대한 풀을 비웁니다.
+        /// Clears the pool for a specific prefab.
+        /// </summary>
+        /// <param name="prefab"></param>
+        /// <returns></returns>
+        public static IPoolInfoReadOnly ClearPool(GameObject prefab)
+        {
+            CreatePool();
+            return s_objectPool.ClearPool(prefab);
+        }
+
+        /// <summary>
+        /// 풀을 비웁니다. 지정된 컴포넌트 타입에 대한 풀을 비웁니다.
+        /// Clears the pool for a specific component type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="prefab"></param>
+        /// <returns></returns>
+        public static IPoolInfoReadOnly ClearPool<T>(T prefab) where T : Component
+        {
+            CreatePool();
+            return s_objectPool.ClearPool(prefab);
+        }
+
+        /// <summary>
+        /// 풀을 비웁니다. Resources에 저장된 프리팹에 대한 풀을 비웁니다.
+        /// Clears the pool for a specific prefab stored in Resources.
+        /// </summary>
+        /// <param name="resources"></param>
+        /// <returns></returns>
+        public static IPoolInfoReadOnly ClearResourcesPool(string resources)
+        {
+            CreatePool();
+            return s_objectPool.ClearResourcesPool(resources);
+        }  
 
         /// <summary>
         /// 오브젝트를 가져옵니다.

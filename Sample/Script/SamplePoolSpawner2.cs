@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static NSJ_EasyPoolKit.EasyObjectPool;
 
 namespace NSJ_EasyPoolKit
 {
@@ -9,6 +10,7 @@ namespace NSJ_EasyPoolKit
         [SerializeField] private Button _getButton;
         [SerializeField] private Button _returnButton;
         [SerializeField] private Button _setPreload;
+        [SerializeField] private Button _clear;
         [SerializeField] private InputField _inputField;
         [SerializeField] private Text _text;
 
@@ -24,16 +26,26 @@ namespace NSJ_EasyPoolKit
             _getButton.onClick.AddListener(() => GetObject());
             _returnButton.onClick.AddListener(() => ReturnObject());
             _setPreload.onClick.AddListener(() => SetPreload());
+            _clear.onClick.AddListener(() => ClearPool());
+        }
+        private void Update()
+        {
+            IPoolInfoReadOnly poolInfo = ObjectPool.GetInfo(_samplePrefab);
+            _text.text = $"Active: {poolInfo.ActiveCount} / Total: {poolInfo.PoolCount}";
         }
 
         private void SetPreload()
         {
             int count = int.TryParse(_inputField.text, out int result) ? result : 0;
-            IPoolInfoReadOnly poolInfo = ObjectPool.SetPreload(_samplePrefab, count).OnDebug("SetPreload Test");
-
-            _text.text = $"Active: {poolInfo.ActiveCount} / Total: {poolInfo.PoolCount}";
+            IPoolInfoReadOnly poolInfo = ObjectPool.SetPreload(_samplePrefab, count).OnDebug("SetResourcesPreload Test");   
+            _inputField.text =string.Empty;
         }
 
+        private void ClearPool()
+        {
+            IPoolInfoReadOnly poolInfo = ObjectPool.ClearPool(_samplePrefab).OnDebug("ClearPool Test");
+
+        }
         private void GetObject()
         {
             // Get Method
@@ -44,7 +56,6 @@ namespace NSJ_EasyPoolKit
             newObj.transform.position = GetRandomPos();
 
             PooledObject pooled = newObj.GetComponent<PooledObject>();
-            _text.text = $"Active: {pooled.PoolInfo.ActiveCount} / Total: {pooled.PoolInfo.PoolCount}";
         }
         private void ReturnObject()
         {
@@ -54,8 +65,6 @@ namespace NSJ_EasyPoolKit
 
                 // Return Method
                 IPoolInfoReadOnly poolInfoReadOnly = ObjectPool.Return(obj).OnDebug("ReturnPool Test");
-
-                _text.text = $"Active: {poolInfoReadOnly.ActiveCount} / Total: {poolInfoReadOnly.PoolCount}";
             }
         }
 

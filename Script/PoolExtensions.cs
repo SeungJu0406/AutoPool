@@ -139,7 +139,7 @@ namespace NSJ_EasyPoolKit
         }
 
         /// <summary>
-        /// Pool 반환 시 제공되는 PoolInfo를 기반으로 디버그 로그를 출력합니다.  
+        /// PoolInfo를 기반으로 디버그 로그를 출력합니다.  
         /// 풀의 현재 상태 (ActiveCount / PoolCount)를 확인할 수 있습니다.
         /// </summary>
         /// <param name="poolInfo">IPoolInfoReadOnly: 읽기 전용 풀 정보</param>
@@ -175,12 +175,21 @@ namespace NSJ_EasyPoolKit
 
             return poolInfo;
         }
-
+        /// <summary>
+        /// 컴포넌트를 GameObject에 추가하거나, 이미 존재하는 컴포넌트를 반환합니다.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static T GetOrAddComponent<T>(this GameObject obj) where T : Component
         {
             return obj.TryGetComponent(out T comp) ? comp : obj.AddComponent<T>();
         }
 
+        /// <summary>
+        /// Mock 모드를 설정합니다. Mock 모드에서는 실제 ObjectPool을 사용하지 않고, Mock ObjectPool을 사용합니다.
+        /// </summary>
+        /// <param name="isMock"></param>
         public static void SetMockMode(bool isMock)
         {
             _isMock = isMock;
