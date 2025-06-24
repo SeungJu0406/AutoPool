@@ -31,6 +31,34 @@ namespace NSJ_EasyPoolKit
             s_objectPool = null;
             CreatePool();
         }
+        /// <summary>
+        /// 풀을 미리 정의된 개수만큼 생성합니다.
+        /// Sets the preload count for a specific prefab in the pool.
+        /// </summary>
+        public static IPoolInfoReadOnly SetPreload(GameObject prefab, int count)
+        {
+            CreatePool();
+            return s_objectPool.SetPreload(prefab, count);
+        }
+
+        /// <summary>
+        /// 풀을 미리 정의된 개수만큼 생성합니다. 컴포넌트를 타입으로 지정할 수 있습니다.
+        /// Sets the preload count for a specific prefab in the pool.
+        /// </summary>
+        public static IPoolInfoReadOnly SetPreload<T>(T prefab, int count) where T : Component
+        {
+            CreatePool();
+            return s_objectPool.SetPreload(prefab, count);
+        }
+        /// <summary>
+        /// 풀을 미리 정의된 개수만큼 생성합니다. Resources에 저장된 프리팹을 기준으로 합니다.
+        /// Sets the preload count for a specific prefab in the pool using a Resources path.
+        /// </summary>
+        public static IPoolInfoReadOnly SetPreload(string resouces, int count)
+        {
+            CreatePool();
+            return s_objectPool.SetPreload(resouces, count);
+        }
 
         /// <summary>
         /// 오브젝트를 가져옵니다.

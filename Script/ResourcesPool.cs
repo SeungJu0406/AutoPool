@@ -7,6 +7,11 @@ namespace NSJ_EasyPoolKit
         // This script is part of a Unity Asset Store package.
         // Unauthorized copying, modification, or redistribution of this code is strictly prohibited.
         // © 2025 NSJ. All rights reserved.
+        public static GameObject Get(string name, Transform transform)
+        {
+            return ObjectPool.ResourcesGet(name, transform);
+        }
+
         public static GameObject Get(string name)
         {
             return ObjectPool.ResourcesGet(name);
