@@ -113,7 +113,7 @@ ObjectPool.Return<T>(instance);
 ```cs
 GameObject instance = ResourcesPool.Get(string);
 ```
-- `Resources/` 경로에서 프리패을 로드하여 풀에서 가져옴
+- `Resources/` 경로에서 프리팹을 로드하여 풀에서 가져옴
 - 리소스 경로는 확장자 없이 작성 ("Prefab/Cube" 등)
 ---
 #### 2. 컴포넌트 타입 반환
@@ -151,8 +151,8 @@ ObjectPool.Return<T>(instance);
 
 ---
 ### IPooledObject 인터페이스
-풀링 오브젝트가 풀에 의해 생성/반환될 때 호출되는 콜백을 정의하는 인터페이스
-사용자가 직접 이 인터페이스를 구현하면, 오브젝트의 상태를 자동으로 초기화하거나 클린업할 수 있음
+풀링된 오브젝트가 풀에 의해 생성 또는 반환될 때 자동으로 호출되는 콜백을 정의하는 인터페이스
+오브젝트 초기화 및 상태 정리를 자동화할 수 있음
 ```cs
 public interface IPooledObject
 {
@@ -163,7 +163,7 @@ public interface IPooledObject
 ---
 #### OnCreatePool
 - 오브젝트가 풀에서 꺼내질 때 호출
-- 생성 직후 초기화, UI리셋, 트리거 재성정 등의 용도로 사용
+- 생성 직후 초기화, UI리셋, 트리거 복원 등의 용도로 사용
 ```cs
 void IPooledObject.OnCreateFromPool()
 {
