@@ -39,7 +39,43 @@
 - Code → Dounload Zip 으로 파일 다운로드 이 후 프로젝트 Assets 폴더에 적용
 
 ## 주요 함수
-## ObjectPool.Get API
+### 풀 수동 제어 API
+풀을 사전에 생성하거나, 비우거나, 상태를 조회할 수 있는 수동 제어 API
+
+#### SetPreload
+```cs
+ObjectPool.SerPreload(prefab, count);
+ResourcesPool.SerPreload("Prefab", count);
+```
+- 지정된 프리팹에 대한 `count` 개수 만큼 미리 생성
+- 현재 풀에 존재하는 수보다 적을 경우 무시 됨
+- 오브젝트는 비활성화 된 상태로 풀에 저장
+---
+#### ClearPool
+```cs
+ObjectPool.ClearPool(prefab);
+ResourcesPool.ClearPreload("Prefab");
+```
+- 지정 프리팹에 대한 풀을 비움
+- 내부 오브젝트는 자동으로 `Destroy()` 처리
+- 해당 프리팹이 다시 사용되면 자동으로 재생성
+
+---
+#### GetInfo
+```cs
+IPoolInfoReadOnly info = ObjectPool.GetInfo(prefab);
+IPoolInfoReadOnly info = ResourcesPool.GetInfo("Prefab);
+```
+- 특정 프리팹에 대한 현재 풀 상태 조회
+**주요 속성**
+```cs
+info.PoolCount    // 총 보유 중인 오브젝트 수
+info.ActiveCount  // 현재 활성화된 오브젝트 수
+info.Name         // 프리팹 이름
+```
+
+---
+### ObjectPool.Get API
 오브젝트 풀에서 프리팹을 기반으로 오브젝트를 가져오는 API
 컴포넌트 반환이나 위치 지정 등 다양한 형태를 지원함.
 
