@@ -516,14 +516,16 @@ namespace AutoPool
             {
                 // 기존 풀에서 꺼냄
                 instance = info.Pool.Pop();
+
+                poolObject = instance.GetComponent<PooledObject>();
+                // Rigidbody 초기화
+                WakeUpRigidBody(poolObject);
+
                 instance.transform.position = Vector3.zero;
                 instance.transform.rotation = Quaternion.identity;
                 instance.transform.SetParent(null);
                 instance.gameObject.SetActive(true);
                 SceneManager.MoveGameObjectToScene(instance, SceneManager.GetActiveScene());
-
-                poolObject = instance.GetComponent<PooledObject>();
-
             }
             else
             {
@@ -531,9 +533,6 @@ namespace AutoPool
                 instance = Instantiate(info.Prefab);
                 poolObject = AddPoolObjectComponent(instance, info);
             }
-            // Rigidbody 초기화
-            WakeUpRigidBody(poolObject);
-
             poolObject.OnCreateFromPool();
             info.ActiveCount++;
             return instance;
@@ -549,6 +548,9 @@ namespace AutoPool
             {
                 // 기존 풀에서 꺼냄
                 instance = info.Pool.Pop();
+                poolObject = instance.GetComponent<PooledObject>();
+                // Rigidbody 초기화
+                WakeUpRigidBody(poolObject);
                 instance.transform.SetParent(transform);
                 if (worldPositionStay == true)
                 {
@@ -561,7 +563,6 @@ namespace AutoPool
                     instance.transform.rotation = transform.rotation;
                 }
                 instance.gameObject.SetActive(true);
-                poolObject = instance.GetComponent<PooledObject>();
             }
             else
             {
@@ -569,9 +570,6 @@ namespace AutoPool
                 instance = Instantiate(info.Prefab, transform, worldPositionStay);
                 poolObject = AddPoolObjectComponent(instance, info);
             }
-            // Rigidbody 초기화
-            WakeUpRigidBody(poolObject);
-
             poolObject.OnCreateFromPool();
             info.ActiveCount++;
             return instance;
@@ -589,12 +587,15 @@ namespace AutoPool
             {
                 // 기존 풀에서 꺼냄
                 instance = info.Pool.Pop();
+                poolObject = instance.GetComponent<PooledObject>();
+                // Rigidbody 초기화
+                WakeUpRigidBody(poolObject);
                 instance.transform.position = pos;
                 instance.transform.rotation = rot;
                 instance.transform.SetParent(null);
                 instance.gameObject.SetActive(true);
                 SceneManager.MoveGameObjectToScene(instance, SceneManager.GetActiveScene());
-                poolObject = instance.GetComponent<PooledObject>();
+
             }
             else
             {
@@ -602,9 +603,6 @@ namespace AutoPool
                 instance = Instantiate(info.Prefab, pos, rot);
                 poolObject = AddPoolObjectComponent(instance, info);
             }
-            // Rigidbody 초기화
-            WakeUpRigidBody(poolObject);
-
             poolObject.OnCreateFromPool();
             info.ActiveCount++;
             return instance;

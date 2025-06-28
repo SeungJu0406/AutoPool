@@ -11,27 +11,6 @@ namespace AutoPool
         private static IObjectPool s_objectPool;
 
         /// <summary>
-        /// Sets the object pool to a mock implementation for testing purposes.
-        /// 모조 풀을 설정합니다. 이 메서드는 테스트 목적으로 모조 풀을 설정할 때 사용됩니다.
-        /// </summary>
-        public static void SetMock()
-        {
-            PoolExtensions.SetMockMode(true);
-            s_objectPool = new MockObjectPool();
-        }
-
-        /// <summary>
-        /// Sets the object pool to a real implementation.
-        /// 풀을 실제 구현으로 설정합니다. 이 메서드는 실제 게임 환경에서 사용할 풀을 생성합니다.
-        /// 이 메서드를 호출하지 않아도 기본적으로 EasyObjectPool이 생성됩니다.
-        /// </summary>
-        public static void SetReal()
-        {
-            PoolExtensions.SetMockMode(false);
-            s_objectPool = null;
-            CreatePool();
-        }
-        /// <summary>
         /// 풀의 정보를 가져옵니다.
         /// Gets the information of the object pool.
         /// </summary>

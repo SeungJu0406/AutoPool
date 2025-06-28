@@ -1,6 +1,4 @@
-# AutoPool
-
-![AutoPool_image_160x160](https://github.com/user-attachments/assets/2177670e-36b9-4fc0-9659-fc90578cef43)
+# NSJ\_EasyPoolKit
 
 A lightweight and easy-to-use object pooling utility for Unity.
 
@@ -310,7 +308,7 @@ Feel free to contribute or open issues on GitHub!
 
 
 
-# AutoPool
+# NSJ_EasyPoolKit
 
 유니티에서 오브젝트 풀링을 간단하고 빠르게 구현하기 위해 만든 툴
 
@@ -353,7 +351,7 @@ Feel free to contribute or open issues on GitHub!
 
 ## 주요 함수
 ### ✨ 풀 수동 제어 API
-풀을 사전에 생성하거나, 비우거나, 상태를 조회할 수 있는 수동 제어 API  
+풀을 사전에 생성하거나, 비우거나, 상태를 조회할 수 있는 수동 제어 API
 
 #### SetPreload
 ```cs
@@ -389,8 +387,8 @@ info.Name         // 프리팹 이름
 
 ---
 ### ✨ ObjectPool.Get API
-오브젝트 풀에서 프리팹을 기반으로 오브젝트를 가져오는 API  
-컴포넌트 반환이나 위치 지정 등 다양한 형태를 지원함.  
+오브젝트 풀에서 프리팹을 기반으로 오브젝트를 가져오는 API
+컴포넌트 반환이나 위치 지정 등 다양한 형태를 지원함.
 
 #### 1. 기본 GameObject 반환
 ```cs
@@ -435,8 +433,8 @@ T instance = ObjectPool.Get<T>(prefab, position, rotation);
 - T 타입 컴포넌트를 반환
 ---
 ### ⟳ ObjectPool.Return API
-풀링된 오브젝트를 반환하는 API  
-오브젝트는 비활성화되며 풀에 다시 보관됨  
+풀링된 오브젝트를 반환하는 API
+오브젝트는 비활성화되며 풀에 다시 보관됨
 
 #### 1. 기본 반환(GameObject)
 ```cs
@@ -454,8 +452,8 @@ ObjectPool.Return<T>(instance);
 - `GameObject` 타입을 따로 꺼내지 않고 컴포넌트 그대로 반환 가능
 ---
 ### ✨ ResourcesPool.Get API
-`Resources.Load`를 통해 리소스에서 프리팹을 로드하고, 풀링하여 오브젝트를 가져오는 API  
-기본 `Get`계열과 동일하지만, 프리팹을 코드에 직접 참조하지 않고 문자열로 지정 가능  
+`Resources.Load`를 통해 리소스에서 프리팹을 로드하고, 풀링하여 오브젝트를 가져오는 API
+기본 `Get`계열과 동일하지만, 프리팹을 코드에 직접 참조하지 않고 문자열로 지정 가능
 
 #### 1. GameObject 반환
 ```cs
@@ -481,8 +479,8 @@ ResourcesPool.Get<T>(string, Vector3, Quaternion)
 - `Get` 계열과 동일한 방식으로 동작
 ---
 ### ⟳ ResourcesPool.Return API
-풀링된 Resources 오브젝트를 반환하는 API  
-기본 오브젝트 풀 반환과 동일하게 동작  
+풀링된 Resources 오브젝트를 반환하는 API
+기본 오브젝트 풀 반환과 동일하게 동작
 
 #### 1. 기본 반환(GameObject)
 ```cs
@@ -497,8 +495,8 @@ ObjectPool.Return<T>(instance);
 - `GameObject` 타입을 따로 꺼내지 않고 컴포넌트 그대로 반환 가능
 
 ### 🔧 IPooledObject 인터페이스
-풀링된 오브젝트가 풀에 의해 생성 또는 반환될 때 자동으로 호출되는 콜백을 정의하는 인터페이스    
-오브젝트 초기화 및 상태 정리를 자동화할 수 있음  
+풀링된 오브젝트가 풀에 의해 생성 또는 반환될 때 자동으로 호출되는 콜백을 정의하는 인터페이스
+오브젝트 초기화 및 상태 정리를 자동화할 수 있음
 ```cs
 public interface IPooledObject
 {
@@ -508,8 +506,8 @@ public interface IPooledObject
 ```
 ---
 #### OnCreateFromPool
-- 오브젝트가 풀에서 꺼내질 때 호출  
-- 생성 직후 초기화, UI리셋, 트리거 복원 등의 용도로 사용  
+- 오브젝트가 풀에서 꺼내질 때 호출
+- 생성 직후 초기화, UI리셋, 트리거 복원 등의 용도로 사용
 ```cs
 void IPooledObject.OnCreateFromPool()
 {
@@ -519,8 +517,8 @@ void IPooledObject.OnCreateFromPool()
 ```
 ---
 #### OnReturnToPool
-- 오브젝트가 풀에 반환되기 직전 호출  
-- 파티클 중단, 타이머 초기화, 오디오 정지 등 상태 정리 용도로 사용  
+- 오브젝트가 풀에 반환되기 직전 호출
+- 파티클 중단, 타이머 초기화, 오디오 정지 등 상태 정리 용도로 사용
 ```cs
 void IPooledObject.OnReturnPool()
 {
@@ -541,19 +539,19 @@ void IPooledObject.OnReturnPool()
 ```
 ---
 ### 🌟 PoolExtensions Utility
-풀링된 오브젝트를 더 쉽게 사용하고, 디버깅을 도와주는 확장 메서드 모음.  
-자동 반환 메서드를 통해 코드를 더욱 간결하게 만들고, 풀 상태를 로그로 출력 가능  
-체이닝 메서드를 통해 사용 가능  
+풀링된 오브젝트를 더 쉽게 사용하고, 디버깅을 도와주는 확장 메서드 모음.
+자동 반환 메서드를 통해 코드를 더욱 간결하게 만들고, 풀 상태를 로그로 출력 가능
+체이닝 메서드를 통해 사용 가능
 #### ReturnAfter(float)
-일정 시간 지난 후 자동으로 풀에 반환. 코루틴 없이도 간단하게 지연 반환 가능  
+일정 시간 지난 후 자동으로 풀에 반환. 코루틴 없이도 간단하게 지연 반환 가능
 ```cs
 ObjectPool.Get(prefab).ReturnAfter(3f);
 ```
 ---
 #### OnDebug()
-풀에서 꺼낼 때 풀 상태 로그 출력  
-일반모드에서는 [GetPool], Mock 모드에서는 [MockGetPool] 로그 출력  
-매개변수로 string을 입력할 시 [Log] 에 입력한 string 값 로그 출력  
+풀에서 꺼낼 때 풀 상태 로그 출력
+일반모드에서는 [GetPool], Mock 모드에서는 [MockGetPool] 로그 출력
+매개변수로 string을 입력할 시 [Log] 에 입력한 string 값 로그 출력
 ```cs
 ObjectPool.Get(prefab).OnDebug("GetPool Test");
 ```
@@ -564,7 +562,7 @@ ObjectPool.Get(prefab).OnDebug("GetPool Test");
 ```
 ---
 #### OnDebugReturn()
-`ReturnAfter()` 이후에 풀 상태 로그 출력  
+`ReturnAfter()` 이후에 풀 상태 로그 출력
 ```cs
 ObjectPool.Get(prefab).ReturnAfter(1f).OnDebugReturn("Return Test");
 ```
@@ -575,7 +573,7 @@ ObjectPool.Get(prefab).ReturnAfter(1f).OnDebugReturn("Return Test");
 ```
 ---
 #### OnDebug(this IPoolInfoReadOnly()
-`Return` 이후에 풀 상태 출력  
+`Return` 이후에 풀 상태 출력
 ```cs
 ObjectPool.Return(instance).OnDebug("ReturnPool Test");
 ```
@@ -586,20 +584,20 @@ ObjectPool.Return(instance).OnDebug("ReturnPool Test");
 ```
 ---
 ### 🤖 테스트용 MockObjectPool
-풀링 시스템을 사용하지 않고, 테스트용으로 가짜 오브젝트를 생성해주는 모드  
-실제 Instantiate 대신 간단한 GameObject를 만들고 Debug.Log()를 출력  
+풀링 시스템을 사용하지 않고, 테스트용으로 가짜 오브젝트를 생성해주는 모드
+실제 Instantiate 대신 간단한 GameObject를 만들고 Debug.Log()를 출력
 
 #### 활성화 : SetMock()
 ```cs
 ObjectPool.SetMock();
 ```
-- 내부 풀을 `MockObjectPool`로 교채  
-- 실제 게임 오브젝트를 풀링하징 않고, 임의의 오브젝트를 새로 생성  
-- 디버깅, 확장 메서드 등 대부분 정상 동작  
+- 내부 풀을 `MockObjectPool`로 교채
+- 실제 게임 오브젝트를 풀링하징 않고, 임의의 오브젝트를 새로 생성
+- 디버깅, 확장 메서드 등 대부분 정상 동작
 ---
 #### 복원 : SetReal()
 ```cs
 ObjectPool.SetReal()
 ```
-- 풀을 다시 실제 `EasyObjectPool` 기반으로 복원  
+- 풀을 다시 실제 `EasyObjectPool` 기반으로 복원
 ---

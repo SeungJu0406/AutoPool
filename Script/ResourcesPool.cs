@@ -8,14 +8,6 @@ namespace AutoPool
         // Unauthorized copying, modification, or redistribution of this code is strictly prohibited.
         // © 2025 NSJ. All rights reserved.
 
-        public static void SetMock()
-        {
-            ObjectPool.SetMock();
-        }
-        public static void SetReal()
-        {
-            ObjectPool.SetReal();
-        }
         /// <summary>
         /// 풀의 정보를 가져옵니다. Resources에 저장된 프리팹을 기준으로 합니다.
         /// Gets the pool information for a specific prefab using a Resources path.

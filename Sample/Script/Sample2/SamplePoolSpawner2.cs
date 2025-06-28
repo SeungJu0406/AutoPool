@@ -1,3 +1,4 @@
+using NUnit.Framework.Constraints;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,36 +21,64 @@ namespace AutoPool
 
         private Queue<SampleObject> _sampleQueue = new Queue<SampleObject>();
 
+        // Sets the preload count for a specific SampleObject in the pool.
+        private IPoolInfoReadOnly SetPreload(SampleObject sample, int count)
+        {
+            return ObjectPool.SetPreload(sample, count).OnDebug("SetPreload Test");
+        }
+
+        // Clears the pool for a specific SampleObject.
+        private IPoolInfoReadOnly ClearPool(SampleObject sample)
+        {
+            return ObjectPool.ClearPool(sample).OnDebug("ClearPool Test");
+        }
+
+        // Spawns a SampleObject from the pool and sets its parent.
+        private SampleObject Spawn(SampleObject sample, Transform parent)
+        {
+            return ObjectPool.Get(sample, parent).OnDebug("GetPool Test");
+        }
+
+        // Spawns a SampleObject from the pool at a specific position and rotation.
+        private IPoolInfoReadOnly Return(SampleObject instance)
+        {
+            return ObjectPool.Return(instance).OnDebug("ReturnPool Test");
+        }
+
+        // Gets the pool information for a specific SampleObject.
+        private IPoolInfoReadOnly GetPoolInfo(SampleObject sample)
+        {
+            return ObjectPool.GetInfo(sample);
+        }
 
         private void Start()
         {
             _getButton.onClick.AddListener(() => GetObject());
             _returnButton.onClick.AddListener(() => ReturnObject());
-            _setPreload.onClick.AddListener(() => SetPreload());
-            _clear.onClick.AddListener(() => ClearPool());
+            _setPreload.onClick.AddListener(() => ProcessPreload());
+            _clear.onClick.AddListener(() => ProcessClearPool());
         }
         private void Update()
         {
-            IPoolInfoReadOnly poolInfo = ObjectPool.GetInfo(_samplePrefab);
+            IPoolInfoReadOnly poolInfo = GetPoolInfo(_samplePrefab);
             _text.text = $"Active: {poolInfo.ActiveCount} / Total: {poolInfo.PoolCount}";
         }
 
-        private void SetPreload()
+        private void ProcessPreload()
         {
             int count = int.TryParse(_inputField.text, out int result) ? result : 0;
-            IPoolInfoReadOnly poolInfo = ObjectPool.SetPreload(_samplePrefab, count).OnDebug("SetResourcesPreload Test");   
+            IPoolInfoReadOnly poolInfo = SetPreload(_samplePrefab, count);
             _inputField.text =string.Empty;
         }
 
-        private void ClearPool()
+        private void ProcessClearPool()
         {
-            IPoolInfoReadOnly poolInfo = ObjectPool.ClearPool(_samplePrefab).OnDebug("ClearPool Test");
+            IPoolInfoReadOnly poolInfo = ClearPool(_samplePrefab);
 
         }
         private void GetObject()
         {
-            // Get Method
-            SampleObject newObj = ObjectPool.Get(_samplePrefab, transform).OnDebug("GetPool Test");
+            SampleObject newObj = Spawn(_samplePrefab, transform);
 
             _sampleQueue.Enqueue(newObj);
 
@@ -63,8 +92,7 @@ namespace AutoPool
             {
                 SampleObject obj = _sampleQueue.Dequeue();
 
-                // Return Method
-                IPoolInfoReadOnly poolInfoReadOnly = ObjectPool.Return(obj).OnDebug("ReturnPool Test");
+                IPoolInfoReadOnly poolInfoReadOnly = Return(obj);
             }
         }
 
