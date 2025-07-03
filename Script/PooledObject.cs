@@ -69,6 +69,7 @@ namespace AutoPool
         /// </summary>
         private void DestroyObject()
         {
+            OnReturnToPool();
             Destroy(gameObject);
         }
 
