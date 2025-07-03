@@ -1,4 +1,4 @@
-# NSJ\_EasyPoolKit
+# NSJ\_AutoPool
 
 A lightweight and easy-to-use object pooling utility for Unity.
 
@@ -281,34 +281,9 @@ info.OnDebug("Returned bullet");
 
 ---
 
-## 🤖 MockObjectPool for Testing
-
-Use mock pool for testing/debugging without spawning real GameObjects.
-
-#### Enable Mock Mode
-
-```csharp
-ObjectPool.SetMock();
-```
-
-#### Restore Real Pool
-
-```csharp
-ObjectPool.SetReal();
-```
-
-Mock mode outputs log statements instead of instantiating real objects. All core APIs work identically.
-
----
-
-Feel free to contribute or open issues on GitHub!
 
 
----
-
-
-
-# NSJ_EasyPoolKit
+# NSJ_AutoPool
 
 유니티에서 오브젝트 풀링을 간단하고 빠르게 구현하기 위해 만든 툴
 
@@ -582,22 +557,4 @@ ObjectPool.Return(instance).OnDebug("ReturnPool Test");
 [ReturnPool] SampleObject (Active : 0 / 1) 
 [Log] : ReturnPool Test
 ```
----
-### 🤖 테스트용 MockObjectPool
-풀링 시스템을 사용하지 않고, 테스트용으로 가짜 오브젝트를 생성해주는 모드
-실제 Instantiate 대신 간단한 GameObject를 만들고 Debug.Log()를 출력
-
-#### 활성화 : SetMock()
-```cs
-ObjectPool.SetMock();
-```
-- 내부 풀을 `MockObjectPool`로 교채
-- 실제 게임 오브젝트를 풀링하징 않고, 임의의 오브젝트를 새로 생성
-- 디버깅, 확장 메서드 등 대부분 정상 동작
----
-#### 복원 : SetReal()
-```cs
-ObjectPool.SetReal()
-```
-- 풀을 다시 실제 `EasyObjectPool` 기반으로 복원
 ---
