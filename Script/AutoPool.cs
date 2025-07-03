@@ -622,7 +622,6 @@ namespace AutoPool
 
             PooledObject poolObject = instance.GetComponent<PooledObject>();
             PoolInfo info = FindPool(poolObject.PoolInfo.Prefab);
-            info.ActiveCount--;
 
             // Transform 초기화
             instance.transform.position = info.Prefab.transform.position;

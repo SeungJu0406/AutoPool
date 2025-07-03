@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace AutoPool
 {
@@ -8,7 +9,7 @@ namespace AutoPool
     // © 2025 NSJ. All rights reserved.
     public class PooledObject : MonoBehaviour
     {
-        public IPoolInfoReadOnly PoolInfo;
+        public AutoPool.PoolInfo PoolInfo;
 
         IPooledObject _poolObject;
 
@@ -28,10 +29,14 @@ namespace AutoPool
         {
             if (AutoPool.Instance == null)
                 return;
-
+            PoolInfo.ActiveCount--;
             OnReturn?.Invoke();
         }
-
+        private void OnDestroy()
+        {
+            PoolInfo.PoolCount--;
+            PoolInfo.OnPoolDormant -= DestroyObject;
+        }
         /// <summary>
         /// 풀링된 오브젝트가 활성화될 때 호출됩니다.
         /// 풀링된 오브젝트가 활성화될 때 초기화 작업을 수행합니다.
@@ -65,8 +70,9 @@ namespace AutoPool
         private void DestroyObject()
         {
             Destroy(gameObject);
-            PoolInfo.OnPoolDormant -= DestroyObject;
         }
+
+
     }
 
     /// <summary>
