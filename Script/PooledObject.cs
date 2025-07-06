@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace AutoPool
 {
@@ -13,8 +12,8 @@ namespace AutoPool
 
         IPooledObject _poolObject;
 
-        public Rigidbody CachedRb {  get; private set; }
-        public Rigidbody2D CachedRb2D {  get; private set; }
+        public Rigidbody CachedRb { get; private set; }
+        public Rigidbody2D CachedRb2D { get; private set; }
 
         public event Action OnReturn;
 

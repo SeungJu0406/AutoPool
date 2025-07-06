@@ -146,9 +146,9 @@ namespace AutoPool
         /// <param name="log">추가 로그 메시지 (선택)</param>
         public static IPoolInfoReadOnly OnDebug(this IPoolInfoReadOnly poolInfo, string log = default)
         {
-            if(poolInfo == null)
+            if (poolInfo == null)
                 return null;
-            if(poolInfo.IsMock == true)
+            if (poolInfo.IsMock == true)
             {
                 if (log == default)
                 {

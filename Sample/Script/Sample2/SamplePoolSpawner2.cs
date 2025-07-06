@@ -1,8 +1,6 @@
-using NUnit.Framework.Constraints;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static AutoPool.AutoPool;
 
 namespace AutoPool
 {
@@ -68,7 +66,7 @@ namespace AutoPool
         {
             int count = int.TryParse(_inputField.text, out int result) ? result : 0;
             IPoolInfoReadOnly poolInfo = SetPreload(_samplePrefab, count);
-            _inputField.text =string.Empty;
+            _inputField.text = string.Empty;
         }
 
         private void ProcessClearPool()

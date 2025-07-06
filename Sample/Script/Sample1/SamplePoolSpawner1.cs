@@ -23,7 +23,7 @@ namespace AutoPool
             Count = count;
             if (Count == 0)
                 return;
-           
+
             float delay = 1f / (float)count;
             _second = new WaitForSeconds(delay);
         }
@@ -36,7 +36,7 @@ namespace AutoPool
         }
         IEnumerator SpawnRoutine()
         {
-            while (true) 
+            while (true)
             {
                 if (Count > 0)
                 {
@@ -47,13 +47,13 @@ namespace AutoPool
                     instance.transform.SetParent(transform, false);
                 }
                 yield return _second;
-            }          
+            }
         }
         private Vector3 GetRandomPos()
         {
             Vector3 randomPos = new Vector3
                 (
-                transform.position.x + Random.Range(-_randomRange.x,_randomRange.x),
+                transform.position.x + Random.Range(-_randomRange.x, _randomRange.x),
                 transform.position.y + Random.Range(-_randomRange.y, _randomRange.y),
                 transform.position.z + Random.Range(-_randomRange.z, _randomRange.z)
                 );

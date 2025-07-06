@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,7 +30,7 @@ namespace AutoPool
 
         private void UpdateText()
         {
-           _text.text = $"{_spawner.Count} / s";
+            _text.text = $"{_spawner.Count} / s";
         }
     }
 }

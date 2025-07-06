@@ -209,6 +209,7 @@ namespace AutoPool
                 PooledObject poolObject = AddPoolObjectComponent(instance, info);
                 instance.transform.SetParent(info.Parent);
                 info.Pool.Push(instance);
+                info.ActiveCount++;
                 instance.gameObject.SetActive(false);
             }
             return info;

@@ -43,7 +43,7 @@ namespace AutoPool
         {
             CreatePool();
             return s_objectPool.GetResourcesInfo(resources);
-        } 
+        }
 
         /// <summary>
         /// 풀을 미리 정의된 개수만큼 생성합니다.
@@ -109,7 +109,7 @@ namespace AutoPool
         {
             CreatePool();
             return s_objectPool.ClearResourcesPool(resources);
-        }  
+        }
 
         /// <summary>
         /// 오브젝트를 가져옵니다.
