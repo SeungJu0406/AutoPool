@@ -54,6 +54,10 @@ NSJ\_EasyPoolKit is built with simplicity and reusability in mind, and can be dr
 * Download ZIP via GitHub Code menu
 * Extract and place in your project's `Assets/` folder
 
+### 3. Asset Store
+- Click "Add to My Assets" on the Asset Store page and install the package.
+- https://assetstore.unity.com/packages/tools/utilities/nsj-autopool-324493
+
 ---
 
 ## Core APIs
@@ -323,6 +327,10 @@ info.OnDebug("Returned bullet");
 
 ### 2. **Zip**
 - Code → Dounload Zip 으로 파일 다운로드 이 후 프로젝트 Assets 폴더에 적용
+
+### 3. **Asset Store**
+- 에셋스토어에서 "내 에셋에 추가하기" 클릭 후 설치
+- https://assetstore.unity.com/packages/tools/utilities/nsj-autopool-324493
 
 ## 주요 함수
 ### ✨ 풀 수동 제어 API
