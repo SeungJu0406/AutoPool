@@ -22,7 +22,6 @@ namespace AutoPool
             // ÇÁ·Î¼¼½º °Ù
             T instance = _getHandler.ProcessGenericGet<T>(poolInfo);
 
-
             return instance;
         }
     }

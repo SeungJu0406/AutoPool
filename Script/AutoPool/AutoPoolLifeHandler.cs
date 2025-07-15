@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -6,7 +7,8 @@ namespace AutoPool
     public class AutoPoolLifeHandler
     {
         AutoPool _autoPool;
-
+        float _maxTimer = 600f;
+        int _delayTime = 10; // seconds
         public AutoPoolLifeHandler(AutoPool autoPool)
         {
             _autoPool = autoPool;
@@ -18,14 +20,14 @@ namespace AutoPool
         /// </summary>
         public IEnumerator IsActiveRoutine(int id)
         {
-            float delayTime = 10f;
-            float timer = _autoPool.MaxTimer;
+            float delayTime = _delayTime;
+            float timer = _maxTimer;
             while (true)
             {
                 // 풀 사용했을때 시간 초기화
                 if (_autoPool.PoolDic[id].IsUsed == true)
                 {
-                    timer = _autoPool.MaxTimer;
+                    timer = _maxTimer;
                     PoolInfo pool = _autoPool.PoolDic[id];
                     pool.IsUsed = false;
                     pool.IsActive = true;
@@ -41,6 +43,35 @@ namespace AutoPool
                 }
                 yield return _autoPool.Second(delayTime);
             }
+        }
+
+        public IEnumerator IsActiveGenericRoutine<T>() where T : class, IPoolGeneric, new()
+        {
+            Type type = typeof(T);
+            float delayTime = _delayTime;
+            float timer = _maxTimer;
+            while (true)
+            {
+                // 풀 사용했을때 시간 초기화
+                if (_autoPool.GenericPoolDic[type].IsUsed == true)
+                {
+                    timer = _maxTimer;
+                    GenericPoolInfo pool = _autoPool.GenericPoolDic[type];
+                    pool.IsUsed = false;
+                    pool.IsActive = true;
+                }
+                // 타이머 종료 시 
+                if (timer <= 0)
+                {
+                    _autoPool.ClearGenericPool<T>();
+                }
+                else
+                {
+                    timer -= delayTime;
+                }
+                yield return _autoPool.Second(delayTime);
+            }
+
         }
     }
 }

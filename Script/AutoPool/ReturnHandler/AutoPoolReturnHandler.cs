@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -75,11 +76,37 @@ namespace AutoPool
                 Debug.LogError($"Generic Pool for {typeof(T)} not found.");
                 return null;
             }
-
             poolGeneric.Pool.IsActive = false;
             genericPool.ActiveCount--;
             genericPool.Pool.Push(instance);
+            poolGeneric.OnReturnToPool();
+            poolGeneric.Pool.Return();
+
             return genericPool;
+        }
+
+        public void GenericReturn<T>(T instance, float delay) where T : class, IPoolGeneric, new()
+        {
+            if (instance == null)
+                return;
+            IPoolGeneric poolGeneric = (IPoolGeneric)instance;
+            if (poolGeneric.Pool.IsActive == false)
+                return;
+            CoroutineRef coroutineRef = new CoroutineRef();
+            coroutineRef.coroutine = _autoPool.StartCoroutine(GenericReturnRoutine(instance, delay, coroutineRef));
+        }
+
+        private IEnumerator GenericReturnRoutine<T>(T instance, float delay, CoroutineRef coroutineRef) where T : class, IPoolGeneric, new()
+        {
+            yield return _autoPool.Second(delay);
+            if (instance == null)
+                yield break;
+            IPoolGeneric poolGeneric = (IPoolGeneric)instance;
+            if (poolGeneric.Pool.IsActive == false)
+                yield break;
+            coroutineRef.coroutine = null;
+
+            GenericReturn(instance);
         }
 
         /// <summary>

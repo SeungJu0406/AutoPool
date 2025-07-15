@@ -36,6 +36,11 @@ namespace AutoPool
             ObjectPool.Return(pooledObj, delay);
             return pooledObj;
         }
+        public static T ReturnGenericAfter<T>(this T poolGeneric, float delay) where T : class, IPoolGeneric, new()
+        {
+            ObjectPool.ReturnGeneric(poolGeneric, delay);
+            return poolGeneric;
+        }
 
         /// <summary>
         /// GameObject가 풀에서 생성된 시점에 풀 상태 디버그 로그를 출력합니다.
@@ -81,6 +86,36 @@ namespace AutoPool
             return instance;
         }
 
+        public static T OnGenericDebug<T>(this T instance, string log = default) where T : class, IPoolGeneric, new()
+        {
+            if (instance == null)
+                return null;
+            IPoolGeneric poolGeneric = (IPoolGeneric)instance;
+            IGenericPoolInfoReadOnly poolInfo = poolGeneric.Pool.PoolInfo;
+            if (poolInfo.IsMock == true)
+            {
+                if (log == default)
+                {
+                    Debug.Log($"[MockPool] {poolInfo.Type}");
+                }
+                else
+                {
+                    Debug.Log($"[MockPool] {poolInfo.Type} \n [Log] : {log}");
+                }
+            }
+            else
+            {
+                if (log == default)
+                {
+                    Debug.Log($"[Pool] {poolInfo.Type} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
+                }
+                else
+                {
+                    Debug.Log($"[Pool] {poolInfo.Type} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
+                }
+            }
+            return instance;
+        }
         /// <summary>
         /// GameObject가 풀로 반환되는 시점에 디버그 로그를 출력합니다.  
         /// 반환 이후 자동으로 이벤트 구독 해제됩니다.
@@ -138,6 +173,47 @@ namespace AutoPool
             return instance;
         }
 
+        public static T OnGenericDebugReturn<T>(this T instance, string log = default) where T : class, IPoolGeneric, new()
+        {
+            if (instance == null)
+                return null;
+            IPoolGeneric poolGeneric = (IPoolGeneric)instance;
+            IGenericPoolInfoReadOnly poolInfo = poolGeneric.Pool.PoolInfo;
+            Action callback = null;
+            if (poolInfo.IsMock == true)
+            {
+                callback = () =>
+                {
+                    if (log == default)
+                    {
+                        Debug.Log($"[MockPool] {poolInfo.Type}");
+                    }
+                    else
+                    {
+                        Debug.Log($"[MockPool] {poolInfo.Type} \n [Log] : {log}");
+                    }
+                    poolGeneric.Pool.OnReturn -= callback;
+                };
+            }
+            else
+            {
+                callback = () =>
+                {
+                    if (log == default)
+                    {
+                        Debug.Log($"[Pool] {poolInfo.Type} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
+                    }
+                    else
+                    {
+                        Debug.Log($"[Pool] {poolInfo.Type} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
+                    }
+                    poolGeneric.Pool.OnReturn -= callback;
+                };
+            }
+            poolGeneric.Pool.OnReturn += callback;
+            return instance;
+        }
+
         /// <summary>
         /// PoolInfo를 기반으로 디버그 로그를 출력합니다.  
         /// 풀의 현재 상태 (ActiveCount / PoolCount)를 확인할 수 있습니다.
@@ -173,6 +249,35 @@ namespace AutoPool
             }
 
 
+            return poolInfo;
+        }
+
+        public static IGenericPoolInfoReadOnly OnGenericDebug(this IGenericPoolInfoReadOnly poolInfo, string log = default)
+        {
+            if (poolInfo == null)
+                return null;
+            if (poolInfo.IsMock == true)
+            {
+                if (log == default)
+                {
+                    Debug.Log($"[MockPool] {poolInfo.Type}");
+                }
+                else
+                {
+                    Debug.Log($"[MockPool] {poolInfo.Type} \n [Log] : {log}");
+                }
+            }
+            else
+            {
+                if (log == default)
+                {
+                    Debug.Log($"[Pool] {poolInfo.Type} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
+                }
+                else
+                {
+                    Debug.Log($"[Pool] {poolInfo.Type} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
+                }
+            }
             return poolInfo;
         }
         /// <summary>

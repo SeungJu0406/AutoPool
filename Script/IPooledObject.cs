@@ -26,5 +26,11 @@ namespace AutoPool
     {
         public GenericPoolInfo PoolInfo;
         public bool IsActive;
+        public event System.Action OnReturn;
+
+        public void Return()
+        {
+            OnReturn?.Invoke();
+        }
     }
 }

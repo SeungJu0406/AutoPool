@@ -32,5 +32,6 @@ namespace AutoPool
         public void Return(GameObject instance, float delay);
         public void Return<T>(T instance, float delay) where T : Component;
         public IGenericPoolInfoReadOnly GenericReturn<T>(T instance) where T : class, IPoolGeneric, new();
+        public void GenericReturn<T>(T instance, float delay) where T : class, IPoolGeneric, new();
     }
 }

@@ -19,9 +19,6 @@ namespace AutoPool
         /// <summary>
         /// 풀 오브젝트 최대 유지 시간입니다. 시간이 지나면 자동 비활성화됩니다.
         /// </summary>
-
-        [HideInInspector] public float MaxTimer = 600f;
-
         private static bool s_isApplicationQuit = false;
 
         private static AutoPool _instance;
@@ -135,6 +132,7 @@ namespace AutoPool
         public IPoolInfoReadOnly ClearPool<T>(T prefab) where T : Component => _preloadHandler.ClearPool(prefab);
 
         public IPoolInfoReadOnly ClearResourcesPool(string resources) => _preloadHandler.ClearResourcesPool(resources);
+        public IGenericPoolInfoReadOnly ClearGenericPool<T>() where T : class, IPoolGeneric, new() => _preloadHandler.ClearGenericPool<T>();
         public void ClearPool(PoolInfo info) => _preloadHandler.ClearPool(info);
         #endregion
         #region GetPool
@@ -216,8 +214,8 @@ namespace AutoPool
         /// 풀에서 오브젝트를 반환합니다. 반환된 오브젝트는 비활성화되고, 지정된 지연 시간 후에 풀에 다시 추가됩니다.
         /// </summary>
         public void Return<T>(T instance, float delay) where T : Component => _returnHandler.Return(instance, delay);
-
         public IGenericPoolInfoReadOnly GenericReturn<T>(T instance) where T : class, IPoolGeneric, new() => _returnHandler.GenericReturn(instance);
+        public void GenericReturn<T>(T instance, float delay) where T : class, IPoolGeneric, new() => _returnHandler.GenericReturn(instance, delay);
         #endregion    
         public PoolInfo FindPool(GameObject poolPrefab) => _findPoolHandler.FindPool(poolPrefab);
         public PoolInfo FindResourcesPool(string resources) => _findPoolHandler.FindResourcesPool(resources);
@@ -225,12 +223,12 @@ namespace AutoPool
         public bool FindObject(PoolInfo info) => _findPoolHandler.FindObject(info);
         public bool FindGeneric<T>(GenericPoolInfo poolInfo) where T : class, IPoolGeneric, new() => _findPoolHandler.FindGeneric<T>(poolInfo);
         public PoolInfo RegisterPool(GameObject poolPrefab, int prefabID) => _createPoolHandler.RegisterPool(poolPrefab, prefabID);
-        public GenericPoolInfo RegisterGenericPool<T>() where T : class, new() => _createPoolHandler.RegisterGenericPool<T>();
+        public GenericPoolInfo RegisterGenericPool<T>() where T : class, IPoolGeneric, new() => _createPoolHandler.RegisterGenericPool<T>();
         public PooledObject AddPoolObjectComponent(GameObject instance, PoolInfo info) => _createPoolHandler.AddPoolObjectComponent(instance, info);
         public void SleepRigidbody(PooledObject instance) => _setRbHandler.SleepRigidbody(instance);
         public void WakeUpRigidBody(PooledObject instance) => _setRbHandler.WakeUpRigidBody(instance);
         public IEnumerator IsActiveRoutine(int id) => _lifeHandler.IsActiveRoutine(id);
-
+        public IEnumerator IsActiveGenericRoutine<T>() where T : class, IPoolGeneric, new() => _lifeHandler.IsActiveGenericRoutine<T>();
 
         /// <summary>
         /// 지정된 시간만큼 대기하는 WaitForSeconds 객체를 반환합니다. 이미 생성된 객체가 있으면 재사용합니다.

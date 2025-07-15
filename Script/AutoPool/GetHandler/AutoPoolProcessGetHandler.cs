@@ -125,8 +125,6 @@ namespace AutoPool
             {
                 poolGeneric = poolInfo.Pool.Pop();
                 instance = (T)poolGeneric;
-
-                Debug.Log($"Generic Pool Get : {typeof(T)}");
             }
             else
             {
@@ -135,13 +133,11 @@ namespace AutoPool
                 poolGeneric.Pool = new PoolGenericInfo();
                 poolGeneric.Pool.PoolInfo = poolInfo;
                 poolInfo.PoolCount++;
-
-                // 풀 라이프 그거 넣어야됨
-                Debug.Log($"Generic Pool Create : {instance}");
+                poolInfo.OnPoolDormant += poolGeneric.OnReturnToPool;
             }
-            poolGeneric.OnCreateFromPool();
             poolInfo.ActiveCount++;
             poolGeneric.Pool.IsActive = true;
+            poolGeneric.OnCreateFromPool();
             return instance;
         }
     }

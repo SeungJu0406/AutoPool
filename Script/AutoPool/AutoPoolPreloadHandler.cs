@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -86,6 +87,13 @@ namespace AutoPool
             return info;
         }
 
+        public IGenericPoolInfoReadOnly ClearGenericPool<T>() where T : class, IPoolGeneric, new()
+        {
+            GenericPoolInfo info = _autoPool.FindGenericPool<T>();
+            ClearGenericPool(info);
+            return info;
+        }
+
         /// <summary>
         /// 지정된 ID의 풀을 비우고 비활성화 처리합니다.
         /// OnPoolDormant 이벤트가 있다면 호출됩니다.
@@ -98,5 +106,11 @@ namespace AutoPool
             info.IsActive = false;
         }
 
+        public void ClearGenericPool(GenericPoolInfo info)
+        {
+            info.OnPoolDormant?.Invoke();
+            info.Pool = new Stack<IPoolGeneric>();
+            info.IsActive = false;
+        }
     }
 }

@@ -31,7 +31,7 @@ namespace AutoPool
             return newPoolInfo;
         }
 
-        public GenericPoolInfo RegisterGenericPool<T>() where T : class, new()
+        public GenericPoolInfo RegisterGenericPool<T>() where T : class, IPoolGeneric,new()
         {
             // 새로운 풀 스택과 정보 생성
             Stack<IPoolGeneric> newPool = new Stack<IPoolGeneric>();
@@ -39,7 +39,7 @@ namespace AutoPool
             // 풀 딕셔너리 추가
             _autoPool.GenericPoolDic.Add(typeof(T), genericPoolInfo);
             // 비활성화 여부 감지 코루틴 시작
-            
+            _autoPool.StartCoroutine(_autoPool.IsActiveGenericRoutine<T>());
             return genericPoolInfo;
         }
         /// <summary>

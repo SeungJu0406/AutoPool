@@ -320,10 +320,15 @@ namespace AutoPool
             s_objectPool.Return(instance, delay);
         }
 
-        public static void ReturnGeneric<T>(T instance) where T : class, IPoolGeneric, new()
+        public static IGenericPoolInfoReadOnly ReturnGeneric<T>(T instance) where T : class, IPoolGeneric, new()
         {
             CreatePool();
-            s_objectPool.GenericReturn(instance);
+            return s_objectPool.GenericReturn(instance);
+        }
+        public static void ReturnGeneric<T>(T instance, float delay) where T : class, IPoolGeneric, new()
+        {
+            CreatePool();
+            s_objectPool.GenericReturn(instance, delay);
         }
         private static void CreatePool()
         {
