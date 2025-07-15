@@ -86,6 +86,11 @@ namespace AutoPool
         {
             return PoolDic.Values.Cast<IPoolInfoReadOnly>().ToList();
         }
+        public List<IGenericPoolInfoReadOnly> GetAllGenericPoolInfos()
+        {
+            return GenericPoolDic.Values.Cast<IGenericPoolInfoReadOnly>().ToList();
+        }
+
 #endif
         private void Awake()
         {
