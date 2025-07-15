@@ -27,12 +27,8 @@ namespace AutoPool
         Transform IPoolInfoReadOnly.Parent => Parent;
         bool IPoolInfoReadOnly.IsActive => IsActive;
         bool IPoolInfoReadOnly.IsUsed => IsUsed;
-
         UnityAction IPoolInfoReadOnly.OnPoolDormant { get => OnPoolDormant; set => OnPoolDormant = value; }
-
         int IPoolInfoReadOnly.PoolCount => PoolCount;
         int IPoolInfoReadOnly.ActiveCount => ActiveCount;
-
-
     }
 }

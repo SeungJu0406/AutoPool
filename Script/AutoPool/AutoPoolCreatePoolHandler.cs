@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,6 +30,18 @@ namespace AutoPool
             _autoPool.StartCoroutine(_autoPool.IsActiveRoutine(prefabID));
             return newPoolInfo;
         }
+
+        public GenericPoolInfo RegisterGenericPool<T>() where T : class, new()
+        {
+            // 새로운 풀 스택과 정보 생성
+            Stack<IPoolGeneric> newPool = new Stack<IPoolGeneric>();
+            GenericPoolInfo genericPoolInfo = GetGenericPoolInfo<T>(newPool);
+            // 풀 딕셔너리 추가
+            _autoPool.GenericPoolDic.Add(typeof(T), genericPoolInfo);
+            // 비활성화 여부 감지 코루틴 시작
+            
+            return genericPoolInfo;
+        }
         /// <summary>
         /// PooledObject 컴포넌트를 오브젝트에 추가하거나 가져옵니다.
         /// PoolInfo를 연결하고, 풀 개수를 증가시키며, 자동 비활성화 이벤트를 구독합니다.
@@ -54,5 +67,12 @@ namespace AutoPool
             return info;
         }
 
+        private GenericPoolInfo GetGenericPoolInfo<T>(Stack<IPoolGeneric> pool) where T : class, new()
+        {
+            GenericPoolInfo genericPool = new GenericPoolInfo();
+            genericPool.Pool = pool;
+            genericPool.Type = typeof(T);
+            return genericPool;
+        }
     }
 }

@@ -1,5 +1,5 @@
+using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace AutoPool
 {
@@ -8,12 +8,14 @@ namespace AutoPool
         AutoPool _autoPool;
         AutoPoolResourcesGetHandler _resourcesGetHandler;
         AutoPoolCommonGetHandler _commonGetHandler;
+        AutoPoolGenericPoolGetHandler _genericGetHandler;
         AutoPoolProcessGetHandler _processGetHandler;
         public AutoPoolGetHandler(AutoPool autoPool)
         {
             _autoPool = autoPool;
             _resourcesGetHandler = new AutoPoolResourcesGetHandler(this, autoPool);
             _commonGetHandler = new AutoPoolCommonGetHandler(this, autoPool);
+            _genericGetHandler = new AutoPoolGenericPoolGetHandler(this, autoPool);
             _processGetHandler = new AutoPoolProcessGetHandler(this, autoPool);
         }
 
@@ -79,7 +81,9 @@ namespace AutoPool
         /// </summary>
         public T ResourcesGet<T>(string resources, Vector3 pos, Quaternion rot) where T : Component => _resourcesGetHandler.ResourcesGet<T>(resources, pos, rot);
         #endregion
-
+        #region Generic
+        public T GenericGet<T>() where T : class, IPoolGeneric, new() => _genericGetHandler.Get<T>();
+        #endregion
         #endregion
 
         /// <summary>
@@ -94,5 +98,7 @@ namespace AutoPool
         /// 풀에서 오브젝트를 가져오고, 지정된 위치와 회전을 설정합니다. 해당 프리팹에 대한 풀 정보를 찾고, 활성화된 오브젝트가 있으면 반환하고, 없으면 새로 생성합니다.
         /// </summary>
         public GameObject ProcessGet(PoolInfo info, Vector3 pos, Quaternion rot) => _processGetHandler.ProcessGet(info, pos, rot);
+
+        public T ProcessGenericGet<T>(GenericPoolInfo poolInfo) where T : class, IPoolGeneric, new() => _processGetHandler.ProcessGenericGet<T>(poolInfo);
     }
 }

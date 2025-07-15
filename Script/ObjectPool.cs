@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace AutoPool
@@ -266,6 +267,12 @@ namespace AutoPool
             CreatePool();
             return s_objectPool.ResourcesGet<T>(resouces, pos, rot);
         }
+
+        public static T GenericPool<T>() where T : class, IPoolGeneric, new()
+        {
+            CreatePool();
+            return s_objectPool.GenericPool<T>();
+        }
         /// <summary>
         /// 오브젝트를 반환합니다.
         /// objects are returned to the pool.
@@ -313,6 +320,11 @@ namespace AutoPool
             s_objectPool.Return(instance, delay);
         }
 
+        public static void ReturnGeneric<T>(T instance) where T : class, IPoolGeneric, new()
+        {
+            CreatePool();
+            s_objectPool.GenericReturn(instance);
+        }
         private static void CreatePool()
         {
             if (s_objectPool == null)

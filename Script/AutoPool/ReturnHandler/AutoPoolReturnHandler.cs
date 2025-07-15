@@ -60,6 +60,28 @@ namespace AutoPool
         {
             Return(instance.gameObject, delay);
         }
+
+        public IGenericPoolInfoReadOnly GenericReturn<T>(T instance) where T : class, IPoolGeneric, new()
+        {
+            if (instance == null)
+                return null;
+            IPoolGeneric poolGeneric = (IPoolGeneric)instance;
+            if(poolGeneric.Pool.IsActive == false)
+                return null;
+            
+            GenericPoolInfo genericPool = _autoPool.FindGenericPool<T>();
+            if (genericPool == null)
+            {
+                Debug.LogError($"Generic Pool for {typeof(T)} not found.");
+                return null;
+            }
+
+            poolGeneric.Pool.IsActive = false;
+            genericPool.ActiveCount--;
+            genericPool.Pool.Push(instance);
+            return genericPool;
+        }
+
         /// <summary>
         /// 풀에서 오브젝트를 반환하는 코루틴입니다. 지정된 지연 시간 후에 오브젝트를 풀에 다시 추가합니다.
         /// </summary>

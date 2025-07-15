@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -68,6 +69,19 @@ namespace AutoPool
             return pool;
         }
 
+        public GenericPoolInfo FindGenericPool<T>() where T : class, IPoolGeneric, new()
+        {
+            GenericPoolInfo genericPool = default;
+            if (_autoPool.GenericPoolDic.ContainsKey(typeof(T)) == false)
+            {
+                _autoPool.RegisterGenericPool<T>();
+            }
+            genericPool = _autoPool.GenericPoolDic[typeof(T)];
+            genericPool.IsUsed = true;
+            _autoPool.GenericPoolDic[typeof(T)] = genericPool;
+            return genericPool;
+        }
+
         /// <summary>
         /// 현재 풀에 재사용 가능한 오브젝트가 존재하는지 확인합니다.
         /// null 오브젝트가 껴 있으면 제거합니다.
@@ -89,9 +103,25 @@ namespace AutoPool
                 // null 제거
                 info.Pool.Pop();
             }
-
             return true;
+        }
 
+        public bool FindGeneric<T>(GenericPoolInfo poolInfo) where T : class, IPoolGeneric, new()
+        {
+            if(poolInfo == null) return false;
+            IPoolGeneric instance = null;
+
+            while (true)
+            {
+                if (poolInfo.Pool.Count <= 0)
+                    return false;
+                instance = poolInfo.Pool.Peek();
+                if (instance != null)
+                    break;
+                // null 제거
+                poolInfo.Pool.Pop();
+            }
+            return true;
         }
     }
 }

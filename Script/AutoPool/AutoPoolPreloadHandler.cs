@@ -43,7 +43,7 @@ namespace AutoPool
         }
         /// <summary>
         /// 풀을 미리 정의된 개수만큼 생성하는 과정의 메서드입니다
-        /// This method processes the preload operation for a given PoolInfo.
+        /// This method processes the preload operation for a given Pool.
         /// </summary>
         private IPoolInfoReadOnly ProcessPreload(PoolInfo info, int count)
         {

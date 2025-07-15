@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -66,6 +67,11 @@ namespace AutoPool
         /// Resources에 저장된 프리팹을 기준으로 풀 정보를 저장하는 딕셔너리 입니다
         /// </summary>
         public Dictionary<string, int> ResourcesPoolDic = new Dictionary<string, int>();
+
+        /// <summary>
+        /// 기본 타입을 기준으로 풀 정보를 저장하는 딕셔너리입니다.
+        /// </summary>
+        public Dictionary<Type, GenericPoolInfo> GenericPoolDic = new Dictionary<Type, GenericPoolInfo>();
         /// <summary>
         /// 동일한 시간 값에 대해 WaitForSeconds 인스턴스를 재사용하기 위한 캐시입니다.
         /// </summary>
@@ -189,7 +195,9 @@ namespace AutoPool
         /// </summary>
         public T ResourcesGet<T>(string resources, Vector3 pos, Quaternion rot) where T : Component => _getHandler.ResourcesGet<T>(resources, pos, rot);
         #endregion
-
+        #region Generic
+        public T GenericPool<T>() where T : class, IPoolGeneric, new() => _getHandler.GenericGet<T>();
+        #endregion
         #endregion
         #region ReturnPool
         /// <summary>
@@ -208,11 +216,16 @@ namespace AutoPool
         /// 풀에서 오브젝트를 반환합니다. 반환된 오브젝트는 비활성화되고, 지정된 지연 시간 후에 풀에 다시 추가됩니다.
         /// </summary>
         public void Return<T>(T instance, float delay) where T : Component => _returnHandler.Return(instance, delay);
+
+        public IGenericPoolInfoReadOnly GenericReturn<T>(T instance) where T : class, IPoolGeneric, new() => _returnHandler.GenericReturn(instance);
         #endregion    
         public PoolInfo FindPool(GameObject poolPrefab) => _findPoolHandler.FindPool(poolPrefab);
         public PoolInfo FindResourcesPool(string resources) => _findPoolHandler.FindResourcesPool(resources);
+        public GenericPoolInfo FindGenericPool<T>() where T : class, IPoolGeneric, new() => _findPoolHandler.FindGenericPool<T>();
         public bool FindObject(PoolInfo info) => _findPoolHandler.FindObject(info);
+        public bool FindGeneric<T>(GenericPoolInfo poolInfo) where T : class, IPoolGeneric, new() => _findPoolHandler.FindGeneric<T>(poolInfo);
         public PoolInfo RegisterPool(GameObject poolPrefab, int prefabID) => _createPoolHandler.RegisterPool(poolPrefab, prefabID);
+        public GenericPoolInfo RegisterGenericPool<T>() where T : class, new() => _createPoolHandler.RegisterGenericPool<T>();
         public PooledObject AddPoolObjectComponent(GameObject instance, PoolInfo info) => _createPoolHandler.AddPoolObjectComponent(instance, info);
         public void SleepRigidbody(PooledObject instance) => _setRbHandler.SleepRigidbody(instance);
         public void WakeUpRigidBody(PooledObject instance) => _setRbHandler.WakeUpRigidBody(instance);

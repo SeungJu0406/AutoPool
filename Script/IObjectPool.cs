@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace AutoPool
@@ -25,10 +26,11 @@ namespace AutoPool
         T ResourcesGet<T>(string resouces) where T : Component;
         T ResourcesGet<T>(string resouces, Transform transform, bool worldPositionStay) where T : Component;
         T ResourcesGet<T>(string resouces, Vector3 pos, Quaternion rot) where T : Component;
-
+        T GenericPool<T>() where T : class, IPoolGeneric, new();
         IPoolInfoReadOnly Return(GameObject instance);
         IPoolInfoReadOnly Return<T>(T instance) where T : Component;
         public void Return(GameObject instance, float delay);
         public void Return<T>(T instance, float delay) where T : Component;
+        public IGenericPoolInfoReadOnly GenericReturn<T>(T instance) where T : class, IPoolGeneric, new();
     }
 }

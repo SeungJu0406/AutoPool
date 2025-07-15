@@ -116,5 +116,33 @@ namespace AutoPool
             info.ActiveCount++;
             return instance;
         }
+
+        public T ProcessGenericGet<T>(GenericPoolInfo poolInfo) where T : class, IPoolGeneric, new()
+        {
+            T instance = null;
+            IPoolGeneric poolGeneric = null;
+            if(_autoPool.FindGeneric<T>(poolInfo))
+            {
+                poolGeneric = poolInfo.Pool.Pop();
+                instance = (T)poolGeneric;
+
+                Debug.Log($"Generic Pool Get : {typeof(T)}");
+            }
+            else
+            {
+                instance = new T();
+                poolGeneric = (IPoolGeneric)instance;
+                poolGeneric.Pool = new PoolGenericInfo();
+                poolGeneric.Pool.PoolInfo = poolInfo;
+                poolInfo.PoolCount++;
+
+                // 풀 라이프 그거 넣어야됨
+                Debug.Log($"Generic Pool Create : {instance}");
+            }
+            poolGeneric.OnCreateFromPool();
+            poolInfo.ActiveCount++;
+            poolGeneric.Pool.IsActive = true;
+            return instance;
+        }
     }
 }
