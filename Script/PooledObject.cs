@@ -8,7 +8,7 @@ namespace AutoPool
     // © 2025 NSJ. All rights reserved.
     public class PooledObject : MonoBehaviour
     {
-        public AutoPool.PoolInfo PoolInfo;
+        public PoolInfo PoolInfo;
 
         IPooledObject _poolObject;
 
