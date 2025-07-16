@@ -6,9 +6,9 @@ namespace AutoPool
 {
     public class AutoPoolFindPoolHandler
     {
-        AutoPool _autoPool;
+        MainAutoPool _autoPool;
 
-        public AutoPoolFindPoolHandler(AutoPool autoPool)
+        public AutoPoolFindPoolHandler(MainAutoPool autoPool)
         {
             _autoPool = autoPool;
         }

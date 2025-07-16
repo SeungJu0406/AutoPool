@@ -9,7 +9,7 @@ namespace AutoPool
     // Unauthorized copying, modification, or redistribution of this code is strictly prohibited.
     // © 2025 NSJ. All rights reserved.
 
-    [CustomEditor(typeof(AutoPool))]
+    [CustomEditor(typeof(MainAutoPool))]
     public class ObjectPoolEditor : Editor
     {
         enum SortType { Name, ActiveCount }
@@ -29,7 +29,7 @@ namespace AutoPool
 
         private void DrawInspectorObjectPool()
         {
-            AutoPool pool = (AutoPool)target;
+            MainAutoPool pool = (MainAutoPool)target;
 
             var infos = pool.GetAllPoolInfos();
 
@@ -121,7 +121,7 @@ namespace AutoPool
         }
         private void DrawInspectorGenericPool()
         {
-            AutoPool pool = (AutoPool)target;
+            MainAutoPool pool = (MainAutoPool)target;
 
             var infos = pool.GetAllGenericPoolInfos();
 

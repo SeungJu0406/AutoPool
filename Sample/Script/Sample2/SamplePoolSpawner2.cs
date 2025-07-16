@@ -22,31 +22,31 @@ namespace AutoPool
         // Sets the preload count for a specific SampleObject in the pool.
         private IPoolInfoReadOnly SetPreload(SampleObject sample, int count)
         {
-            return ObjectPool.SetPreload(sample, count).OnDebug("SetPreload Test");
+            return AutoPool.SetPreload(sample, count).OnDebug("SetPreload Test");
         }
 
         // Clears the pool for a specific SampleObject.
         private IPoolInfoReadOnly ClearPool(SampleObject sample)
         {
-            return ObjectPool.ClearPool(sample).OnDebug("ClearPool Test");
+            return AutoPool.ClearPool(sample).OnDebug("ClearPool Test");
         }
 
         // Spawns a SampleObject from the pool and sets its parent.
         private SampleObject Spawn(SampleObject sample, Transform parent)
         {
-            return ObjectPool.Get(sample, parent).OnDebug("GetPool Test");
+            return AutoPool.Get(sample, parent).OnDebug("GetPool Test");
         }
 
         // Spawns a SampleObject from the pool at a specific position and rotation.
         private IPoolInfoReadOnly Return(SampleObject instance)
         {
-            return ObjectPool.Return(instance).OnDebug("ReturnPool Test");
+            return AutoPool.Return(instance).OnDebug("ReturnPool Test");
         }
 
         // Gets the pool information for a specific SampleObject.
         private IPoolInfoReadOnly GetPoolInfo(SampleObject sample)
         {
-            return ObjectPool.GetInfo(sample);
+            return AutoPool.GetInfo(sample);
         }
 
         private void Start()

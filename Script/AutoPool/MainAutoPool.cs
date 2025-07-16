@@ -14,18 +14,18 @@ namespace AutoPool
     /// 오브젝트 풀링을 위한 메인 클래스입니다.
     /// 자동 반환, 딜레이 반환, 재사용 가능한 풀 구조를 제공합니다.
     /// </summary>
-    public class AutoPool : MonoBehaviour, IObjectPool
+    public class MainAutoPool : MonoBehaviour, IObjectPool
     {
         /// <summary>
         /// 풀 오브젝트 최대 유지 시간입니다. 시간이 지나면 자동 비활성화됩니다.
         /// </summary>
         private static bool s_isApplicationQuit = false;
 
-        private static AutoPool _instance;
+        private static MainAutoPool _instance;
         /// <summary>
-        /// AutoPool 싱글톤 인스턴스입니다. 자동 생성됩니다.
+        /// MainAutoPool 싱글톤 인스턴스입니다. 자동 생성됩니다.
         /// </summary>
-        public static AutoPool Instance
+        public static MainAutoPool Instance
         {
             get
             {
@@ -37,7 +37,7 @@ namespace AutoPool
             }
         }
 
-        public static AutoPool CreatePool()
+        public static MainAutoPool CreatePool()
         {
             if (_instance != null)
             {
@@ -47,9 +47,9 @@ namespace AutoPool
             {
                 if (s_isApplicationQuit == true)
                     return null;
-                // 새로운 AutoPool GameObject 생성 및 할당
-                GameObject newPool = new GameObject("AutoPool");
-                AutoPool pool = newPool.AddComponent<AutoPool>();
+                // 새로운 MainAutoPool GameObject 생성 및 할당
+                GameObject newPool = new GameObject("MainAutoPool");
+                MainAutoPool pool = newPool.AddComponent<MainAutoPool>();
                 return pool;
             }
         }

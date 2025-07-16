@@ -4,10 +4,10 @@ namespace AutoPool
 {
     public class AutoPoolCommonGetHandler
     {
-        AutoPool _autoPool;
+        MainAutoPool _autoPool;
         AutoPoolGetHandler _getHandler;
 
-        public AutoPoolCommonGetHandler( AutoPoolGetHandler getHandler, AutoPool autoPool)
+        public AutoPoolCommonGetHandler( AutoPoolGetHandler getHandler, MainAutoPool autoPool)
         {
             _autoPool = autoPool;
             _getHandler = getHandler;

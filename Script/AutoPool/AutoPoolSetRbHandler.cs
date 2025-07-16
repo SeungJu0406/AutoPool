@@ -4,9 +4,9 @@ namespace AutoPool
 {
     public class AutoPoolSetRbHandler
     {
-        AutoPool _autoPool;
+        MainAutoPool _autoPool;
 
-        public AutoPoolSetRbHandler(AutoPool autoPool)
+        public AutoPoolSetRbHandler(MainAutoPool autoPool)
         {
             _autoPool = autoPool;
         }

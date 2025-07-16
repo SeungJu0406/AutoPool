@@ -6,12 +6,12 @@ namespace AutoPool
     {
         public static T Get<T>() where T : class, IPoolGeneric, new()
         {
-            return ObjectPool.GenericPool<T>();
+            return AutoPool.GenericPool<T>();
         }
 
         public static IGenericPoolInfoReadOnly Return<T>(T instance) where T : class, IPoolGeneric, new()
         {
-            return ObjectPool.ReturnGeneric(instance);
+            return AutoPool.ReturnGeneric(instance);
         }
     }
 }

@@ -5,12 +5,12 @@ namespace AutoPool
 {
     public class AutoPoolGetHandler
     {
-        AutoPool _autoPool;
+        MainAutoPool _autoPool;
         AutoPoolResourcesGetHandler _resourcesGetHandler;
         AutoPoolCommonGetHandler _commonGetHandler;
         AutoPoolGenericPoolGetHandler _genericGetHandler;
         AutoPoolProcessGetHandler _processGetHandler;
-        public AutoPoolGetHandler(AutoPool autoPool)
+        public AutoPoolGetHandler(MainAutoPool autoPool)
         {
             _autoPool = autoPool;
             _resourcesGetHandler = new AutoPoolResourcesGetHandler(this, autoPool);

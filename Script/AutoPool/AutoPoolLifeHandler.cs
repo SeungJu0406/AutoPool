@@ -6,10 +6,10 @@ namespace AutoPool
 {
     public class AutoPoolLifeHandler
     {
-        AutoPool _autoPool;
+        MainAutoPool _autoPool;
         float _maxTimer = 600f;
         int _delayTime = 10; // seconds
-        public AutoPoolLifeHandler(AutoPool autoPool)
+        public AutoPoolLifeHandler(MainAutoPool autoPool)
         {
             _autoPool = autoPool;
         }

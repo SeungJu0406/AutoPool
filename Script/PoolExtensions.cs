@@ -21,7 +21,7 @@ namespace AutoPool
         /// <param name="delay">지연 시간 (초)</param>
         public static GameObject ReturnAfter(this GameObject pooledObj, float delay)
         {
-            ObjectPool.Return(pooledObj, delay);
+            AutoPool.Return(pooledObj, delay);
             return pooledObj;
         }
 
@@ -33,12 +33,12 @@ namespace AutoPool
         /// <param name="delay">지연 시간 (초)</param>
         public static T ReturnAfter<T>(this T pooledObj, float delay) where T : Component
         {
-            ObjectPool.Return(pooledObj, delay);
+            AutoPool.Return(pooledObj, delay);
             return pooledObj;
         }
         public static T ReturnGenericAfter<T>(this T poolGeneric, float delay) where T : class, IPoolGeneric, new()
         {
-            ObjectPool.ReturnGeneric(poolGeneric, delay);
+            AutoPool.ReturnGeneric(poolGeneric, delay);
             return poolGeneric;
         }
 
@@ -300,11 +300,11 @@ namespace AutoPool
             _isMock = isMock;
             if (_isMock)
             {
-                Debug.LogWarning("Mock mode is enabled. This will not use the actual ObjectPool.");
+                Debug.LogWarning("Mock mode is enabled. This will not use the actual AutoPool.");
             }
             else
             {
-                Debug.Log("Mock mode is disabled. Using the actual ObjectPool.");
+                Debug.Log("Mock mode is disabled. Using the actual AutoPool.");
             }
         }
     }

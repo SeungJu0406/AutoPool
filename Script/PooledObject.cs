@@ -26,7 +26,7 @@ namespace AutoPool
 
         private void OnDisable()
         {
-            if (AutoPool.Instance == null)
+            if (MainAutoPool.Instance == null)
                 return;
             PoolInfo.ActiveCount--;
             OnReturn?.Invoke();

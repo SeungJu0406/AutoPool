@@ -6,9 +6,9 @@ namespace AutoPool
     public class AutoPoolGenericPoolGetHandler
     {
         AutoPoolGetHandler _getHandler;
-        AutoPool _autoPool;
+        MainAutoPool _autoPool;
 
-        public AutoPoolGenericPoolGetHandler(AutoPoolGetHandler getHandler,AutoPool autoPool)
+        public AutoPoolGenericPoolGetHandler(AutoPoolGetHandler getHandler,MainAutoPool autoPool)
         {
             _autoPool = autoPool;
             _getHandler = getHandler;
