@@ -12,8 +12,6 @@ namespace AutoPool
     /// </summary>
     public static class PoolExtensions
     {
-        private static bool _isMock = false;
-
         /// <summary>
         /// 일정 시간(delay) 후 풀로 자동 반환합니다. 반환 전까지는 오브젝트를 사용할 수 있습니다.
         /// </summary>
@@ -36,7 +34,7 @@ namespace AutoPool
             AutoPool.Return(pooledObj, delay);
             return pooledObj;
         }
-        public static T ReturnGenericAfter<T>(this T poolGeneric, float delay) where T : class, IPoolGeneric, new()
+        public static T ReturnAfterGeneric<T>(this T poolGeneric, float delay) where T : class, IPoolGeneric, new()
         {
             AutoPool.ReturnGeneric(poolGeneric, delay);
             return poolGeneric;
@@ -49,62 +47,38 @@ namespace AutoPool
         /// <param name="log">추가 로그 메시지 (선택)</param>
         public static GameObject OnDebug(this GameObject instance, string log = default)
         {
+#if UNITY_EDITOR
             PooledObject pooledObject = instance.GetComponent<PooledObject>();
             IPoolInfoReadOnly poolInfo = pooledObject.PoolInfo;
-
-            if (poolInfo.IsMock == true)
+            if (log == default)
             {
-                if (log == default)
-                {
-                    Debug.Log($"[MockPool] : {poolInfo.Name}");
-                }
-                else
-                {
-                    Debug.Log($"[MockPool] : {poolInfo.Name} \n[Log] : {log}");
-                }
+                Debug.Log($"[Pool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
             }
             else
             {
-                if (log == default)
-                {
-                    Debug.Log($"[Pool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
-                }
-                else
-                {
-                    Debug.Log($"[Pool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
-                }
+                Debug.Log($"[Pool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
             }
+#endif
             return instance;
         }
 
         /// <summary>
         /// Component 타입도 GameObject 기반 OnDebug()를 사용할 수 있도록 래핑합니다.
         /// </summary>
-        public static T OnDebug<T>(this T instance, string log = default) where T : Component
+        public static T OnDebug<T>(this T instance, string log = default)
         {
-            OnDebug(instance.gameObject, log);
-            return instance;
-        }
-
-        public static T OnGenericDebug<T>(this T instance, string log = default) where T : class, IPoolGeneric, new()
-        {
+#if UNITY_EDITOR
             if (instance == null)
-                return null;
-            IPoolGeneric poolGeneric = (IPoolGeneric)instance;
-            IGenericPoolInfoReadOnly poolInfo = poolGeneric.Pool.PoolInfo;
-            if (poolInfo.IsMock == true)
+                return instance;
+
+            if (instance is Component component)
             {
-                if (log == default)
-                {
-                    Debug.Log($"[MockPool] {poolInfo.Type}");
-                }
-                else
-                {
-                    Debug.Log($"[MockPool] {poolInfo.Type} \n [Log] : {log}");
-                }
+                OnDebug(component.gameObject, log);
+                return instance;
             }
-            else
+            if(instance is IPoolGeneric poolGeneric)
             {
+                IGenericPoolInfoReadOnly poolInfo = poolGeneric.Pool.PoolInfo;
                 if (log == default)
                 {
                     Debug.Log($"[Pool] {poolInfo.Type} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
@@ -113,7 +87,11 @@ namespace AutoPool
                 {
                     Debug.Log($"[Pool] {poolInfo.Type} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
                 }
+                return instance;
             }
+
+            Debug.Log($"[Unknown] {instance.GetType()} \n [Log] : {log}");
+#endif
             return instance;
         }
         /// <summary>
@@ -122,81 +100,47 @@ namespace AutoPool
         /// </summary>
         public static GameObject OnDebugReturn(this GameObject instance, string log = default)
         {
+#if UNITY_EDITOR
             PooledObject pooledObject = instance.GetComponent<PooledObject>();
             IPoolInfoReadOnly poolInfo = pooledObject.PoolInfo;
 
-
-
             Action callback = null;
-
-            if (poolInfo.IsMock == true)
+            callback = () =>
             {
-                callback = () =>
+                if (log == default)
                 {
-                    if (log == default)
-                    {
-                        Debug.Log($"[MockPool] {poolInfo.Name}");
-                    }
-                    else
-                    {
-                        Debug.Log($"[MockPool] {poolInfo.Name} \n [Log] : {log}");
-                    }
-                    pooledObject.OnReturn -= callback;
-                };
-            }
-            else
-            {
-                callback = () =>
+                    Debug.Log($"[Pool] {poolInfo.Name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
+                }
+                else
                 {
-                    if (log == default)
-                    {
-                        Debug.Log($"[Pool] {poolInfo.Name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
-                    }
-                    else
-                    {
-                        Debug.Log($"[Pool] {poolInfo.Name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
-                    }
-                    pooledObject.OnReturn -= callback;
-                };
-            }
+                    Debug.Log($"[Pool] {poolInfo.Name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
+                }
+                pooledObject.OnReturn -= callback;
+            };
 
             pooledObject.OnReturn += callback;
+#endif
             return instance;
         }
 
         /// <summary>
         /// Component 타입도 GameObject 기반 OnDebugReturn()을 사용할 수 있도록 래핑합니다.
         /// </summary>
-        public static T OnDebugReturn<T>(this T instance, string log = default) where T : Component
+        public static T OnDebugReturn<T>(this T instance, string log = default)
         {
-            OnDebugReturn(instance.gameObject, log);
-            return instance;
-        }
-
-        public static T OnGenericDebugReturn<T>(this T instance, string log = default) where T : class, IPoolGeneric, new()
-        {
+#if UNITY_EDITOR
             if (instance == null)
-                return null;
-            IPoolGeneric poolGeneric = (IPoolGeneric)instance;
-            IGenericPoolInfoReadOnly poolInfo = poolGeneric.Pool.PoolInfo;
-            Action callback = null;
-            if (poolInfo.IsMock == true)
+                return instance;
+            if(instance is Component component)
             {
-                callback = () =>
-                {
-                    if (log == default)
-                    {
-                        Debug.Log($"[MockPool] {poolInfo.Type}");
-                    }
-                    else
-                    {
-                        Debug.Log($"[MockPool] {poolInfo.Type} \n [Log] : {log}");
-                    }
-                    poolGeneric.Pool.OnReturn -= callback;
-                };
+                OnDebugReturn(component.gameObject, log);
+                return instance;
             }
-            else
+            if(instance is IPoolGeneric poolGeneric)
             {
+                IGenericPoolInfoReadOnly poolInfo = poolGeneric.Pool.PoolInfo;
+                Action callback = null;
+
                 callback = () =>
                 {
                     if (log == default)
@@ -209,8 +153,11 @@ namespace AutoPool
                     }
                     poolGeneric.Pool.OnReturn -= callback;
                 };
+
+                poolGeneric.Pool.OnReturn += callback;
+                return instance;
             }
-            poolGeneric.Pool.OnReturn += callback;
+#endif
             return instance;
         }
 
@@ -222,62 +169,38 @@ namespace AutoPool
         /// <param name="log">추가 로그 메시지 (선택)</param>
         public static IPoolInfoReadOnly OnDebug(this IPoolInfoReadOnly poolInfo, string log = default)
         {
+#if UNITY_EDITOR
             if (poolInfo == null)
                 return null;
-            if (poolInfo.IsMock == true)
+
+            if (log == default)
             {
-                if (log == default)
-                {
-                    Debug.Log($"[MockPool] {poolInfo.Name}");
-                }
-                else
-                {
-                    Debug.Log($"[MockPool] {poolInfo.Name} \n [Log] : {log}");
-                }
+                Debug.Log($"[Pool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
             }
             else
             {
-                if (log == default)
-                {
-                    Debug.Log($"[Pool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
-                }
-                else
-                {
 
-                    Debug.Log($"[Pool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
-                }
+                Debug.Log($"[Pool] {poolInfo.Prefab.name} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
             }
-
-
+#endif
             return poolInfo;
         }
 
-        public static IGenericPoolInfoReadOnly OnGenericDebug(this IGenericPoolInfoReadOnly poolInfo, string log = default)
+        public static IGenericPoolInfoReadOnly OnDebug(this IGenericPoolInfoReadOnly poolInfo, string log = default)
         {
+#if UNITY_EDITOR
             if (poolInfo == null)
                 return null;
-            if (poolInfo.IsMock == true)
+
+            if (log == default)
             {
-                if (log == default)
-                {
-                    Debug.Log($"[MockPool] {poolInfo.Type}");
-                }
-                else
-                {
-                    Debug.Log($"[MockPool] {poolInfo.Type} \n [Log] : {log}");
-                }
+                Debug.Log($"[Pool] {poolInfo.Type} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
             }
             else
             {
-                if (log == default)
-                {
-                    Debug.Log($"[Pool] {poolInfo.Type} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount})");
-                }
-                else
-                {
-                    Debug.Log($"[Pool] {poolInfo.Type} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
-                }
+                Debug.Log($"[Pool] {poolInfo.Type} (Active : {poolInfo.ActiveCount} / {poolInfo.PoolCount}) \n [Log] : {log}");
             }
+#endif
             return poolInfo;
         }
         /// <summary>
@@ -289,23 +212,6 @@ namespace AutoPool
         public static T GetOrAddComponent<T>(this GameObject obj) where T : Component
         {
             return obj.TryGetComponent(out T comp) ? comp : obj.AddComponent<T>();
-        }
-
-        /// <summary>
-        /// Mock 모드를 설정합니다. Mock 모드에서는 실제 ObjectPool을 사용하지 않고, Mock ObjectPool을 사용합니다.
-        /// </summary>
-        /// <param name="isMock"></param>
-        public static void SetMockMode(bool isMock)
-        {
-            _isMock = isMock;
-            if (_isMock)
-            {
-                Debug.LogWarning("Mock mode is enabled. This will not use the actual AutoPool.");
-            }
-            else
-            {
-                Debug.Log("Mock mode is disabled. Using the actual AutoPool.");
-            }
         }
     }
 }

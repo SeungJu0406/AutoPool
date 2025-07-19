@@ -34,17 +34,6 @@ namespace AutoPool
             CreatePool();
             return s_objectPool.GetInfo(prefab);
         }
-        /// <summary>
-        /// 풀의 정보를 가져옵니다. Resources에 저장된 프리팹을 기준으로 합니다.
-        /// Gets the information of the object pool for a specific prefab stored in Resources.
-        /// </summary>
-        /// <param name="resources"></param>
-        /// <returns></returns>
-        public static IPoolInfoReadOnly GetResourcesInfo(string resources)
-        {
-            CreatePool();
-            return s_objectPool.GetResourcesInfo(resources);
-        }
 
         /// <summary>
         /// 풀을 미리 정의된 개수만큼 생성합니다.
@@ -64,15 +53,6 @@ namespace AutoPool
         {
             CreatePool();
             return s_objectPool.SetPreload(prefab, count);
-        }
-        /// <summary>
-        /// 풀을 미리 정의된 개수만큼 생성합니다. Resources에 저장된 프리팹을 기준으로 합니다.
-        /// Sets the preload count for a specific prefab in the pool using a Resources path.
-        /// </summary>
-        public static IPoolInfoReadOnly SetResourcesPreload(string resouces, int count)
-        {
-            CreatePool();
-            return s_objectPool.SetResourcesPreload(resouces, count);
         }
 
         /// <summary>
@@ -98,18 +78,6 @@ namespace AutoPool
         {
             CreatePool();
             return s_objectPool.ClearPool(prefab);
-        }
-
-        /// <summary>
-        /// 풀을 비웁니다. Resources에 저장된 프리팹에 대한 풀을 비웁니다.
-        /// Clears the pool for a specific prefab stored in Resources.
-        /// </summary>
-        /// <param name="resources"></param>
-        /// <returns></returns>
-        public static IPoolInfoReadOnly ClearResourcesPool(string resources)
-        {
-            CreatePool();
-            return s_objectPool.ClearResourcesPool(resources);
         }
 
         /// <summary>
@@ -190,69 +158,7 @@ namespace AutoPool
             CreatePool();
             return s_objectPool.Get(prefab, pos, rot);
         }
-        /// <summary>
-        /// 오브젝트를 Resources에서 가져옵니다.
-        /// Get an object from Resources.
-        /// </summary>
-        /// <param name="resouces"></param>
-        /// <returns></returns>
-        public static GameObject ResourcesGet(string resouces)
-        {
-            CreatePool();
-            return s_objectPool.ResourcesGet(resouces);
-        }
-        /// <summary>
-        /// 오브젝트를 Resources에서 가져옵니다. 트랜스폼을 지정할 수 있습니다.
-        ///  Get an object from Resources with a specified transform.
-        /// </summary>
-        /// <param name="resouces"></param>
-        /// <param name="transform"></param>
-        /// <param name="worldPositionStay"></param>
-        /// <returns></returns>
-        public static GameObject ResourcesGet(string resouces, Transform transform, bool worldPositionStay = default)
-        {
-            CreatePool();
-            return s_objectPool.ResourcesGet(resouces, transform, worldPositionStay);
-        }
-        /// <summary>
-        /// 오브젝트를 Resources에서 가져옵니다. 위치와 회전을 지정할 수 있습니다.
-        /// Get an object from Resources with a specified position and rotation.
-        /// </summary>
-        /// <param name="resouces"></param>
-        /// <param name="pos"></param>
-        /// <param name="rot"></param>
-        /// <returns></returns>
-        public static GameObject ResourcesGet(string resouces, Vector3 pos, Quaternion rot)
-        {
-            CreatePool();
-            return s_objectPool.ResourcesGet(resouces, pos, rot);
-        }
-        /// <summary>
-        /// 오브젝트를 Resources에서 가져옵니다. 컴포넌트를 반환합니다.
-        /// Get an object from Resources and returns a component of type T.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="resouces"></param>
-        /// <returns></returns>
-        public static T ResourcesGet<T>(string resouces) where T : Component
-        {
-            CreatePool();
-            return s_objectPool.ResourcesGet<T>(resouces);
-        }
-        /// <summary>
-        /// 오브젝트를 Resources에서 가져옵니다. 컴포넌트를 반환합니다. 트랜스폼을 지정할 수 있습니다.
-        /// Get an object from Resources and returns a component of type T with a specified transform.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="resouces"></param>
-        /// <param name="transform"></param>
-        /// <param name="worldPositionStay"></param>
-        /// <returns></returns>
-        public static T ResourcesGet<T>(string resouces, Transform transform, bool worldPositionStay = default) where T : Component
-        {
-            CreatePool();
-            return s_objectPool.ResourcesGet<T>(resouces, transform, worldPositionStay);
-        }
+      
         /// <summary>
         /// 오브젝트를 Resources에서 가져옵니다. 컴포넌트를 반환합니다. 위치와 회전을 지정할 수 있습니다.
         /// Get an object from Resources and returns a component of type T with a specified position and rotation.
