@@ -590,7 +590,7 @@ ObjectPool.Get(prefab).ReturnAfter(3f);
 ```cs
 ObjectPool.Get(prefab).ReturnWhen(Func<bool>)
 ```
-
+---
 
 #### OnDebug()
 풀에서 꺼낼 때 풀 상태 로그 출력
