@@ -8,7 +8,7 @@ namespace AutoPool_Tool
         private GameObject Spawn(GameObject prefab, Vector3 pos, Quaternion rot)
         {
             // Pooling Method
-            return AutoPool.Get(prefab, pos, transform.rotation).ReturnAfter(_returnDelay);
+            return ObjectPool.Get(prefab, pos, transform.rotation).ReturnAfter(_returnDelay);
         }
 
 

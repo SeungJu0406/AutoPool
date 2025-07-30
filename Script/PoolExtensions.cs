@@ -20,7 +20,7 @@ namespace AutoPool_Tool
         /// <param name="delay">지연 시간 (초)</param>
         public static GameObject ReturnAfter(this GameObject pooledObj, float delay)
         {
-            AutoPool.Return(pooledObj, delay);
+            ObjectPool.Return(pooledObj, delay);
             return pooledObj;
         }
 
@@ -32,12 +32,12 @@ namespace AutoPool_Tool
         /// <param name="delay">지연 시간 (초)</param>
         public static T ReturnAfter<T>(this T pooledObj, float delay) where T : Component
         {
-            AutoPool.Return(pooledObj, delay);
+            ObjectPool.Return(pooledObj, delay);
             return pooledObj;
         }
         public static T ReturnAfterGeneric<T>(this T poolGeneric, float delay) where T : class, IPoolGeneric, new()
         {
-            AutoPool.ReturnGeneric(poolGeneric, delay);
+            ObjectPool.ReturnGeneric(poolGeneric, delay);
             return poolGeneric;
         }
 
@@ -244,7 +244,7 @@ namespace AutoPool_Tool
                     yield break;
                 yield return null;
             }
-            AutoPool.Return(pooledObj.gameObject);
+            ObjectPool.Return(pooledObj.gameObject);
         }
 
         static IEnumerator ReuturnWhenCoroutine<T>(T pooledObj, Func<bool> condition) where T : class, IPoolGeneric, new()
@@ -253,7 +253,7 @@ namespace AutoPool_Tool
             {
                 yield return null;
             }
-            AutoPool.ReturnGeneric(pooledObj);
+            ObjectPool.ReturnGeneric(pooledObj);
         }
         #endregion
     }
