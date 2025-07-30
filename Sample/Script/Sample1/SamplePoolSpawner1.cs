@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace AutoPool
+namespace AutoPool_Tool
 {
     public class SamplePoolSpawner1 : MonoBehaviour
     {

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace AutoPool
+namespace AutoPool_Tool
 {
     /// <summary>
     /// 풀 정보 클래스입니다. 각 프리팹에 대한 풀 상태 및 정보를 저장합니다.

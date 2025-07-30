@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace AutoPool
+namespace AutoPool_Tool
 {
     public static class ResourcesPool
     {

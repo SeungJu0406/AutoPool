@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace AutoPool
+namespace AutoPool_Tool
 {
     public class GenericPoolInfo : IGenericPoolInfoReadOnly
     {

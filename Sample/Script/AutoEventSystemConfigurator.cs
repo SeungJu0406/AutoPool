@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem.UI;
 #endif
-namespace AutoPool
+namespace AutoPool_Tool
 {
 
     [DefaultExecutionOrder(-999)]

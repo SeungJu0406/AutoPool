@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace AutoPool
+namespace AutoPool_Tool
 {
     public class SamplePoolSpawner2 : MonoBehaviour
     {
@@ -19,7 +19,7 @@ namespace AutoPool
 
         private Queue<SampleObject> _sampleQueue = new Queue<SampleObject>();
 
-        // Sets the preload count for a specific SampleObject in the pool.
+        // Sets the preload _id for a specific SampleObject in the pool.
         private IPoolInfoReadOnly SetPreload(SampleObject sample, int count)
         {
             return AutoPool.SetPreload(sample, count).OnDebug("SetPreload Test");

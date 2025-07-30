@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace AutoPool
+namespace AutoPool_Tool
 {
     public class ObjectCountController : MonoBehaviour
     {

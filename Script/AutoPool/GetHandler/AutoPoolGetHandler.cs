@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace AutoPool
+namespace AutoPool_Tool
 {
     public class AutoPoolGetHandler
     {

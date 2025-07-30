@@ -1,7 +1,8 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
-namespace AutoPool
+namespace AutoPool_Tool
 {
     // This script is part of a Unity Asset Store package.
     // Unauthorized copying, modification, or redistribution of this code is strictly prohibited.
@@ -40,6 +41,25 @@ namespace AutoPool
             return poolGeneric;
         }
 
+        public static GameObject ReturnWhen(this GameObject pooledObj, Func<bool> condition)
+        {
+            PooledObject pooledObject = pooledObj.GetComponent<PooledObject>();
+            MainAutoPool.Instance.StartCoroutine(ReturnWhenCoroutine(pooledObject, condition));
+            return pooledObj;
+        }
+
+        public static T ReturnWhen<T>(this T pooledObj, Func<bool> condition) where T : Component
+        {
+            PooledObject pooledObject = pooledObj.GetComponent<PooledObject>();
+            MainAutoPool.Instance.StartCoroutine(ReturnWhenCoroutine(pooledObject, condition));
+            return pooledObj;
+        }
+
+        public static T ReturnWhenGeneric<T>(this T pooledObj, Func<bool> condition) where T : class, IPoolGeneric, new()
+        {
+            MainAutoPool.Instance.StartCoroutine(ReuturnWhenCoroutine(pooledObj, condition));
+            return pooledObj;
+        }
         /// <summary>
         /// GameObject가 풀에서 생성된 시점에 풀 상태 디버그 로그를 출력합니다.
         /// </summary>
@@ -213,5 +233,28 @@ namespace AutoPool
         {
             return obj.TryGetComponent(out T comp) ? comp : obj.AddComponent<T>();
         }
+
+
+        #region ReturnWhenCoroutine
+        static IEnumerator ReturnWhenCoroutine(PooledObject pooledObj, Func<bool> condition)
+        {
+            while (!condition())
+            {
+                if (pooledObj.gameObject.activeSelf == false)
+                    yield break;
+                yield return null;
+            }
+            AutoPool.Return(pooledObj.gameObject);
+        }
+
+        static IEnumerator ReuturnWhenCoroutine<T>(T pooledObj, Func<bool> condition) where T : class, IPoolGeneric, new()
+        {
+            while (!condition())
+            {
+                yield return null;
+            }
+            AutoPool.ReturnGeneric(pooledObj);
+        }
+        #endregion
     }
 }

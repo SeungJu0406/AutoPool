@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace AutoPool
+namespace AutoPool_Tool
 {
     public class AutoPoolPreloadHandler
     {

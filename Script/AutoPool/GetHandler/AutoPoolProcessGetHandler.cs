@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace AutoPool
+namespace AutoPool_Tool
 {
     public class AutoPoolProcessGetHandler
     {

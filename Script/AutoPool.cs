@@ -1,11 +1,11 @@
 using System;
 using UnityEngine;
 
-namespace AutoPool
+namespace AutoPool_Tool
 {
     /// <summary>
-    ///  AutoPool 클래스는 게임 오브젝트 풀링을 관리하는 유틸리티 클래스입니다.
-    ///  The AutoPool class is a utility class for managing game object pooling.
+    ///  AutoPool_Tool 클래스는 게임 오브젝트 풀링을 관리하는 유틸리티 클래스입니다.
+    ///  The AutoPool_Tool class is a utility class for managing game object pooling.
     /// </summary>
     public static class AutoPool
     {
