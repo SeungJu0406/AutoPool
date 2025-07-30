@@ -246,6 +246,29 @@ public class Bullet : MonoBehaviour, IPooledObject {
   }
 }
 ```
+---
+### GenericPool API
+A pooling system designed for general-purpose classes, not limited to `GameObject` or `Component` types.
+```cs
+public class GenericSample : IPoolGeneric
+{
+    public PoolGenericInfo Pool { get; set; }
+
+    public void OnCreateFromPool(){ }
+    public void OnReturnToPool(){ }
+}
+```
+
+#### 1. Get
+```cs
+T instance = GenericPool.Get<T>();
+```
+
+#### 2. Return
+```cs
+GenericPool.Return(instance);
+```
+
 
 ---
 
@@ -259,6 +282,13 @@ Extension methods to simplify pooling behavior and debugging.
 ObjectPool.Get(prefab).ReturnAfter(3f);
 ```
 
+#### ReturnWhen
+Automatically returns the object to the pool when the specified condition evaluates to true.
+
+```csharp
+ObjectPool.Get(prefab).ReturnWhen(Func<bool>)
+```
+    
 #### OnDebug()
 
 ```csharp
@@ -521,6 +551,30 @@ void IPooledObject.OnReturnPool()
     }
 ```
 ---
+### GenericPool API
+게임오브젝트 또는 컴포넌트 타입이 아닌 일반 클래스에 대해서도 풀링을 적용할 수 있는 풀
+```cs
+public class GenericSample : IPoolGeneric
+{
+    public PoolGenericInfo Pool { get; set; }
+
+    public void OnCreateFromPool(){ }
+    public void OnReturnToPool(){ }
+}
+```
+
+#### 1. Get
+```cs
+T instance = GenericPool.Get<T>();
+```
+
+#### 2. Return
+```cs
+GenericPool.Return(instance);
+```
+
+
+---
 ### 🌟 PoolExtensions Utility
 풀링된 오브젝트를 더 쉽게 사용하고, 디버깅을 도와주는 확장 메서드 모음.
 자동 반환 메서드를 통해 코드를 더욱 간결하게 만들고, 풀 상태를 로그로 출력 가능
@@ -531,6 +585,13 @@ void IPooledObject.OnReturnPool()
 ObjectPool.Get(prefab).ReturnAfter(3f);
 ```
 ---
+#### ReturnWhen(Func<bool>)
+특정 조건 확인 후 true일때 자동으로 풀에 반환
+```cs
+ObjectPool.Get(prefab).ReturnWhen(Func<bool>)
+```
+---
+
 #### OnDebug()
 풀에서 꺼낼 때 풀 상태 로그 출력
 일반모드에서는 [GetPool], Mock 모드에서는 [MockGetPool] 로그 출력
