@@ -26,9 +26,14 @@ namespace AutoPool_Tool
 
         private void OnDisable()
         {
-            if (MainAutoPool.Instance == null)
+            if (ObjectPool.Instance == null)
                 return;
             PoolInfo.ActiveCount--;
+            if(PoolInfo.ActiveCount < 0)
+            {
+                PoolInfo.PoolCount++;
+                PoolInfo.ActiveCount = 0;
+            }
             OnReturn?.Invoke();
         }
         private void OnDestroy()
@@ -36,10 +41,6 @@ namespace AutoPool_Tool
             PoolInfo.PoolCount--;
             PoolInfo.OnPoolDormant -= DestroyObject;
         }
-        /// <summary>
-        /// 풀링된 오브젝트가 활성화될 때 호출됩니다.
-        /// 풀링된 오브젝트가 활성화될 때 초기화 작업을 수행합니다.
-        /// </summary>
         public void OnCreateFromPool()
         {
             if (_poolObject != null)
@@ -56,16 +57,11 @@ namespace AutoPool_Tool
             }
         }
 
-        /// <summary>
-        /// 풀이 비활성화될 때 호출되는 이벤트를 구독합니다.
-        /// </summary>
         public void SubscribePoolDeactivateEvent()
         {
             PoolInfo.OnPoolDormant += DestroyObject;
         }
-        /// <summary>
-        /// 풀이 비활성화될 때 호출됩니다.
-        /// </summary>
+
         private void DestroyObject()
         {
             OnReturnToPool();

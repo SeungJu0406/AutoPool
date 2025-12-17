@@ -8,28 +8,15 @@ namespace AutoPool_Tool
     // Unauthorized copying, modification, or redistribution of this code is strictly prohibited.
     // ? 2025 NSJ. All rights reserved.
 
-    /// <summary>
-    /// 풀링 객체에 대한 디버그 및 반환 기능을 확장 제공하는 유틸 클래스입니다.
-    /// </summary>
     public static class PoolExtensions
     {
-        /// <summary>
-        /// 일정 시간(delay) 후 풀로 자동 반환합니다. 반환 전까지는 오브젝트를 사용할 수 있습니다.
-        /// </summary>
-        /// <param name="pooledObj">풀링된 GameObject</param>
-        /// <param name="delay">지연 시간 (초)</param>
+
         public static GameObject ReturnAfter(this GameObject pooledObj, float delay)
         {
             ObjectPool.Return(pooledObj, delay);
             return pooledObj;
         }
 
-        /// <summary>
-        /// 일정 시간(delay) 후 풀로 자동 반환합니다. 반환 전까지는 오브젝트를 사용할 수 있습니다.
-        /// </summary>
-        /// <typeparam name="T">Component 타입</typeparam>
-        /// <param name="pooledObj">풀링된 컴포넌트</param>
-        /// <param name="delay">지연 시간 (초)</param>
         public static T ReturnAfter<T>(this T pooledObj, float delay) where T : Component
         {
             ObjectPool.Return(pooledObj, delay);
@@ -44,27 +31,22 @@ namespace AutoPool_Tool
         public static GameObject ReturnWhen(this GameObject pooledObj, Func<bool> condition)
         {
             PooledObject pooledObject = pooledObj.GetComponent<PooledObject>();
-            MainAutoPool.Instance.StartCoroutine(ReturnWhenCoroutine(pooledObject, condition));
+            ObjectPool.Instance.StartCoroutine(ReturnWhenCoroutine(pooledObject, condition));
             return pooledObj;
         }
 
         public static T ReturnWhen<T>(this T pooledObj, Func<bool> condition) where T : Component
         {
             PooledObject pooledObject = pooledObj.GetComponent<PooledObject>();
-            MainAutoPool.Instance.StartCoroutine(ReturnWhenCoroutine(pooledObject, condition));
+            ObjectPool.Instance.StartCoroutine(ReturnWhenCoroutine(pooledObject, condition));
             return pooledObj;
         }
 
         public static T ReturnWhenGeneric<T>(this T pooledObj, Func<bool> condition) where T : class, IPoolGeneric, new()
         {
-            MainAutoPool.Instance.StartCoroutine(ReuturnWhenCoroutine(pooledObj, condition));
+            ObjectPool.Instance.StartCoroutine(ReuturnWhenCoroutine(pooledObj, condition));
             return pooledObj;
         }
-        /// <summary>
-        /// GameObject가 풀에서 생성된 시점에 풀 상태 디버그 로그를 출력합니다.
-        /// </summary>
-        /// <param name="instance">풀링된 GameObject</param>
-        /// <param name="log">추가 로그 메시지 (선택)</param>
         public static GameObject OnDebug(this GameObject instance, string log = default)
         {
 #if UNITY_EDITOR
@@ -81,10 +63,6 @@ namespace AutoPool_Tool
 #endif
             return instance;
         }
-
-        /// <summary>
-        /// Component 타입도 GameObject 기반 OnDebug()를 사용할 수 있도록 래핑합니다.
-        /// </summary>
         public static T OnDebug<T>(this T instance, string log = default)
         {
 #if UNITY_EDITOR
@@ -114,10 +92,6 @@ namespace AutoPool_Tool
 #endif
             return instance;
         }
-        /// <summary>
-        /// GameObject가 풀로 반환되는 시점에 디버그 로그를 출력합니다.  
-        /// 반환 이후 자동으로 이벤트 구독 해제됩니다.
-        /// </summary>
         public static GameObject OnDebugReturn(this GameObject instance, string log = default)
         {
 #if UNITY_EDITOR
@@ -143,9 +117,6 @@ namespace AutoPool_Tool
             return instance;
         }
 
-        /// <summary>
-        /// Component 타입도 GameObject 기반 OnDebugReturn()을 사용할 수 있도록 래핑합니다.
-        /// </summary>
         public static T OnDebugReturn<T>(this T instance, string log = default)
         {
 #if UNITY_EDITOR
@@ -181,12 +152,6 @@ namespace AutoPool_Tool
             return instance;
         }
 
-        /// <summary>
-        /// PoolInfo를 기반으로 디버그 로그를 출력합니다.  
-        /// 풀의 현재 상태 (ActiveCount / PoolCount)를 확인할 수 있습니다.
-        /// </summary>
-        /// <param name="poolInfo">IPoolInfoReadOnly: 읽기 전용 풀 정보</param>
-        /// <param name="log">추가 로그 메시지 (선택)</param>
         public static IPoolInfoReadOnly OnDebug(this IPoolInfoReadOnly poolInfo, string log = default)
         {
 #if UNITY_EDITOR
@@ -223,12 +188,6 @@ namespace AutoPool_Tool
 #endif
             return poolInfo;
         }
-        /// <summary>
-        /// 컴포넌트를 GameObject에 추가하거나, 이미 존재하는 컴포넌트를 반환합니다.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="obj"></param>
-        /// <returns></returns>
         public static T GetOrAddComponent<T>(this GameObject obj) where T : Component
         {
             return obj.TryGetComponent(out T comp) ? comp : obj.AddComponent<T>();
@@ -238,10 +197,8 @@ namespace AutoPool_Tool
         #region ReturnWhenCoroutine
         static IEnumerator ReturnWhenCoroutine(PooledObject pooledObj, Func<bool> condition)
         {
-            while (!condition())
+            while (!condition() && pooledObj.gameObject.activeSelf == true)
             {
-                if (pooledObj.gameObject.activeSelf == false)
-                    yield break;
                 yield return null;
             }
             ObjectPool.Return(pooledObj.gameObject);
