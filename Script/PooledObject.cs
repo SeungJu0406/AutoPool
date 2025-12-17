@@ -26,18 +26,16 @@ namespace AutoPool_Tool
 
         private void OnDisable()
         {
-            if (ObjectPool.Instance == null)
+            if (ObjectPool.HasPool == false)
                 return;
             PoolInfo.ActiveCount--;
-            if(PoolInfo.ActiveCount < 0)
-            {
-                PoolInfo.PoolCount++;
-                PoolInfo.ActiveCount = 0;
-            }
             OnReturn?.Invoke();
         }
         private void OnDestroy()
         {
+            if (ObjectPool.HasPool == false)
+                return;
+
             PoolInfo.PoolCount--;
             PoolInfo.OnPoolDormant -= DestroyObject;
         }
