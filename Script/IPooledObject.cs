@@ -3,64 +3,64 @@ using UnityEngine;
 namespace AutoPool_Tool
 {
     /// <summary>
-    /// 풀에서 생성 및 반환될 때 콜백을 제공하는 기본 풀 오브젝트 인터페이스입니다.
+    /// Implement this interface on a MonoBehaviour to receive pool lifecycle callbacks.
     /// </summary>
     public interface IPooledObject
     {
         /// <summary>
-        /// 객체가 풀에서 처음 생성되거나 다시 가져올 때 호출됩니다.
+        /// Called when the object is retrieved from the pool.
         /// </summary>
         void OnCreateFromPool();
 
         /// <summary>
-        /// 객체가 풀로 반환될 때 호출됩니다.
+        /// Called when the object is returned to the pool.
         /// </summary>
         void OnReturnToPool();
     }
 
     /// <summary>
-    /// 제네릭 풀 관리 정보를 포함하는 풀 오브젝트 인터페이스입니다.
+    /// Implement this interface on a plain C# class to make it compatible with the generic pool.
     /// </summary>
     public interface IPoolGeneric
     {
         /// <summary>
-        /// 이 객체가 속한 제네릭 풀 관련 정보입니다.
+        /// Per-instance generic pool state managed by the pool system.
         /// </summary>
         PoolGenericInfo Pool { get; set; }
 
         /// <summary>
-        /// 객체가 제네릭 풀에서 생성되거나 다시 가져올 때 호출됩니다.
+        /// Called when the object is retrieved from the generic pool.
         /// </summary>
         void OnCreateFromPool();
 
         /// <summary>
-        /// 객체가 제네릭 풀로 반환될 때 호출됩니다.
+        /// Called when the object is returned to the generic pool.
         /// </summary>
         void OnReturnToPool();
     }
 
     /// <summary>
-    /// 제네릭 풀에 속한 개별 객체의 상태와 반환 동작을 관리하는 정보 클래스입니다.
+    /// Per-instance state container for objects managed by the generic pool.
     /// </summary>
     public class PoolGenericInfo
     {
         /// <summary>
-        /// 이 객체가 속한 제네릭 풀의 정보입니다.
+        /// Reference to the shared pool this instance belongs to.
         /// </summary>
         public GenericPoolInfo PoolInfo;
 
         /// <summary>
-        /// 현재 객체가 활성 상태인지 여부입니다.
+        /// Whether this instance is currently active (in use).
         /// </summary>
         public bool IsActive;
 
         /// <summary>
-        /// 객체가 풀로 반환될 때 호출되는 이벤트입니다.
+        /// Fired when this instance is returned to the pool.
         /// </summary>
         public event System.Action OnReturn;
 
         /// <summary>
-        /// 객체를 풀로 반환할 때 호출되어 관련 콜백을 실행합니다.
+        /// Invokes the OnReturn event.
         /// </summary>
         public void Return()
         {
