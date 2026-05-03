@@ -4,24 +4,32 @@ using UnityEngine;
 
 namespace AutoPool_Tool
 {
+    /// <summary>
+    /// 프리팹, Resources, 제네릭 타입 기준으로 풀을 검색·지연 생성하는 핸들러입니다.
+    /// </summary>
     public class AutoPoolFindPoolHandler
     {
+        /// <summary>
+        /// 풀 딕셔너리를 보유한 메인 풀 객체입니다.
+        /// </summary>
         MainAutoPool _autoPool;
 
+        /// <summary>
+        /// 지정된 메인 풀 인스턴스로 풀 검색 핸들러를 초기화합니다.
+        /// </summary>
         public AutoPoolFindPoolHandler(MainAutoPool autoPool)
         {
             _autoPool = autoPool;
         }
 
         /// <summary>
-        /// 해당 프리팹에 대한 풀 정보를 찾거나, 없으면 새로 생성합니다.
-        /// 프리팹의 인스턴스 ID를 기준으로 Dictionary에서 관리됩니다.
+        /// 프리팹을 키로 사용하는 풀을 찾거나, 없으면 새로 등록한 뒤 반환합니다.
         /// </summary>
         public PoolInfo FindPool(GameObject poolPrefab)
         {
             if (poolPrefab == null)
             {
-                Debug.LogError($"{poolPrefab}가 참조되어 있지 않습니다");
+                Debug.LogError($"{poolPrefab} is not referenced.");
                 return null;
             }
 
@@ -39,8 +47,7 @@ namespace AutoPool_Tool
         }
 
         /// <summary>
-        /// 해당 프리팹에 대한 풀 정보를 찾거나, 없으면 새로 생성합니다.
-        /// 프리팹의 인스턴스 ID를 기준으로 Dictionary에서 관리됩니다.
+        /// Resources 경로 문자열을 키로 사용하는 풀을 찾거나, 없으면 새로 등록한 뒤 반환합니다.
         /// </summary>
         public PoolInfo FindResourcesPool(string resources)
         {
@@ -48,18 +55,17 @@ namespace AutoPool_Tool
             PoolInfo pool = default;
             if (resourcePool.ContainsKey(resources) == false)
             {
-                // 리소시스 프리팹 로드
                 GameObject prefab = Resources.Load<GameObject>(resources);
                 if (prefab == null)
                 {
-                    Debug.LogError($"Resources에 {resources}와 일치하는 리소스가 없습니다");
+                    Debug.LogError($"There's no resource in Resources that matches {resources}.");
                     return null;
                 }
-                // 프리팹 instanceID값 캐싱
+
                 int prefabID = prefab.GetInstanceID();
-                // 풀에 등록
+
                 _autoPool.RegisterPool(prefab, prefabID);
-                // 리소시스 풀에 등록
+
                 resourcePool.Add(resources, prefabID);
             }
 
@@ -69,6 +75,9 @@ namespace AutoPool_Tool
             return pool;
         }
 
+        /// <summary>
+        /// 제네릭 타입 <typeparamref name="T"/> 에 대한 제네릭 풀을 찾거나, 없으면 새로 등록한 뒤 반환합니다.
+        /// </summary>
         public GenericPoolInfo FindGenericPool<T>() where T : class, IPoolGeneric, new()
         {
             GenericPoolInfo genericPool = default;
@@ -83,8 +92,7 @@ namespace AutoPool_Tool
         }
 
         /// <summary>
-        /// 현재 풀에 재사용 가능한 오브젝트가 존재하는지 확인합니다.
-        /// null 오브젝트가 껴 있으면 제거합니다.
+        /// 지정된 풀에서 유효한 GameObject 인스턴스가 존재하는지 검사하고, null 항목은 스택에서 제거합니다.
         /// </summary>
         public bool FindObject(PoolInfo info)
         {
@@ -100,15 +108,17 @@ namespace AutoPool_Tool
                 if (instance != null)
                     break;
 
-                // null 제거
                 info.Pool.Pop();
             }
             return true;
         }
 
+        /// <summary>
+        /// 지정된 제네릭 풀에서 유효한 인스턴스가 존재하는지 검사하고, null 항목은 스택에서 제거합니다.
+        /// </summary>
         public bool FindGeneric<T>(GenericPoolInfo poolInfo) where T : class, IPoolGeneric, new()
         {
-            if(poolInfo == null) return false;
+            if (poolInfo == null) return false;
             IPoolGeneric instance = null;
 
             while (true)
@@ -118,7 +128,7 @@ namespace AutoPool_Tool
                 instance = poolInfo.Pool.Peek();
                 if (instance != null)
                     break;
-                // null 제거
+
                 poolInfo.Pool.Pop();
             }
             return true;

@@ -6,241 +6,334 @@ using UnityEngine;
 
 namespace AutoPool_Tool
 {
-    // This script is part of a Unity Asset Store package.
-    // Unauthorized copying, modification, or redistribution of this code is strictly prohibited.
-    // © 2025 NSJ. All rights reserved.
 
     /// <summary>
-    /// 오브젝트 풀링을 위한 메인 클래스입니다.
-    /// 자동 반환, 딜레이 반환, 재사용 가능한 풀 구조를 제공합니다.
+    /// 씬 전체에서 사용하는 중앙 풀 매니저입니다.
+    /// 프리팹 / Resources / 제네릭 풀에 대한 생성, 대여, 반환, 프리로드를 통합 관리합니다.
     /// </summary>
     public class MainAutoPool : MonoBehaviour, IObjectPool
     {
         /// <summary>
-        /// 풀 오브젝트 최대 유지 시간입니다. 시간이 지나면 자동 비활성화됩니다.
+        /// 애플리케이션 종료 상태 플래그입니다. 종료 중에는 풀 생성을 방지합니다.
         /// </summary>
         private static bool s_isApplicationQuit = false;
 
-        private static MainAutoPool _instance;
         /// <summary>
-        /// MainAutoPool 싱글톤 인스턴스입니다. 자동 생성됩니다.
+        /// 새로운 메인 풀 GameObject를 생성하고 <see cref="MainAutoPool"/> 컴포넌트를 추가합니다.
+        /// 애플리케이션 종료 중이면 null을 반환합니다.
         /// </summary>
-        public static MainAutoPool Instance
-        {
-            get
-            {
-                return CreatePool();
-            }
-            set
-            {
-                _instance = value;
-            }
-        }
-
         public static MainAutoPool CreatePool()
         {
-            if (_instance != null)
-            {
-                return _instance;
-            }
-            else
-            {
-                if (s_isApplicationQuit == true)
-                    return null;
-                // 새로운 MainAutoPool GameObject 생성 및 할당
-                GameObject newPool = new GameObject("MainAutoPool");
-                MainAutoPool pool = newPool.AddComponent<MainAutoPool>();
-                return pool;
-            }
+            if (s_isApplicationQuit == true)
+                return null;
+
+            GameObject newPool = new GameObject("MainAutoPool"); // 풀 루트 오브젝트 생성
+            MainAutoPool pool = newPool.AddComponent<MainAutoPool>(); // MainAutoPool 컴포넌트 부착
+            return pool;
         }
 
-
         /// <summary>
-        /// 프리팹 ID를 기준으로 풀 정보를 저장하는 딕셔너리입니다.
+        /// 프리팹 InstanceID를 키로 갖는 GameObject 풀 딕셔너리입니다.
         /// </summary>
         public Dictionary<int, PoolInfo> PoolDic = new Dictionary<int, PoolInfo>();
 
         /// <summary>
-        /// Resources에 저장된 프리팹을 기준으로 풀 정보를 저장하는 딕셔너리 입니다
+        /// Resources 경로 문자열을 키로, 프리팹 InstanceID를 값으로 갖는 매핑 딕셔너리입니다.
         /// </summary>
         public Dictionary<string, int> ResourcesPoolDic = new Dictionary<string, int>();
 
         /// <summary>
-        /// 기본 타입을 기준으로 풀 정보를 저장하는 딕셔너리입니다.
+        /// 타입을 키로 갖는 제네릭 풀 딕셔너리입니다.
         /// </summary>
         public Dictionary<Type, GenericPoolInfo> GenericPoolDic = new Dictionary<Type, GenericPoolInfo>();
+
         /// <summary>
-        /// 동일한 시간 값에 대해 WaitForSeconds 인스턴스를 재사용하기 위한 캐시입니다.
+        /// 동일한 시간 값에 대한 <see cref="WaitForSeconds"/> 인스턴스를 캐싱하는 딕셔너리입니다.
         /// </summary>
         public Dictionary<float, WaitForSeconds> DelayDic = new Dictionary<float, WaitForSeconds>();
 
+        /// <summary>Get 관련 로직을 담당하는 핸들러입니다.</summary>
         private AutoPoolGetHandler _getHandler;
+        /// <summary>Return 관련 로직을 담당하는 핸들러입니다.</summary>
         private AutoPoolReturnHandler _returnHandler;
+        /// <summary>Preload / Clear 관련 로직을 담당하는 핸들러입니다.</summary>
         private AutoPoolPreloadHandler _preloadHandler;
+        /// <summary>Pool 검색 관련 로직을 담당하는 핸들러입니다.</summary>
         private AutoPoolFindPoolHandler _findPoolHandler;
+        /// <summary>Pool 생성 관련 로직을 담당하는 핸들러입니다.</summary>
         private AutoPoolCreatePoolHandler _createPoolHandler;
+        /// <summary>Rigidbody Sleep / Wake 제어를 담당하는 핸들러입니다.</summary>
         private AutoPoolSetRbHandler _setRbHandler;
-        private AutoPoolLifeHandler _lifeHandler;
+
 #if UNITY_EDITOR
+        /// <summary>
+        /// 에디터에서 GameObject 풀의 전체 상태 정보를 조회합니다.
+        /// </summary>
         public List<IPoolInfoReadOnly> GetAllPoolInfos()
         {
             return PoolDic.Values.Cast<IPoolInfoReadOnly>().ToList();
         }
+
+        /// <summary>
+        /// 에디터에서 제네릭 풀의 전체 상태 정보를 조회합니다.
+        /// </summary>
         public List<IGenericPoolInfoReadOnly> GetAllGenericPoolInfos()
         {
             return GenericPoolDic.Values.Cast<IGenericPoolInfoReadOnly>().ToList();
         }
-
 #endif
+
+        /// <summary>
+        /// 초기화 시 각 역할별 핸들러를 생성합니다.
+        /// </summary>
         private void Awake()
         {
-            SetSingleTon();
             SetHandler();
         }
+
         #region GetInfo
+
+        /// <summary>
+        /// 프리팹 기반 풀 정보를 조회합니다.
+        /// </summary>
         public IPoolInfoReadOnly GetInfo(GameObject prefab)
         {
             return FindPool(prefab);
         }
 
+        /// <summary>
+        /// 컴포넌트 프리팹 기반 풀 정보를 조회합니다.
+        /// </summary>
         public IPoolInfoReadOnly GetInfo<T>(T prefab) where T : Component
         {
             return FindPool(prefab.gameObject);
         }
 
+        /// <summary>
+        /// Resources 경로 기반 풀 정보를 조회합니다.
+        /// </summary>
         public IPoolInfoReadOnly GetResourcesInfo(string resources)
         {
             return FindResourcesPool(resources);
         }
+
         #endregion
+
         #region SePreload
+
         /// <summary>
-        /// 풀을 미리 정의된 개수만큼 생성합니다.
-        /// Sets the preload count for a specific prefab in the pool.
+        /// 프리팹 기반 풀에 대해 지정 수량만큼 프리로드를 수행합니다.
         /// </summary>
         public IPoolInfoReadOnly SetPreload(GameObject prefab, int count) => _preloadHandler.SetPreload(prefab, count);
 
         /// <summary>
-        /// 풀을 미리 정의된 개수만큼 생성합니다. 컴포넌트를 타입으로 지정할 수 있습니다.
-        /// Sets the preload count for a specific prefab in the pool.
+        /// 컴포넌트 프리팹 기반 풀에 대해 지정 수량만큼 프리로드를 수행합니다.
         /// </summary>
         public IPoolInfoReadOnly SetPreload<T>(T prefab, int count) where T : Component => _preloadHandler.SetPreload(prefab, count);
 
         /// <summary>
-        /// 풀을 미리 정의된 개수만큼 생성합니다. Resources에 저장된 프리팹을 기준으로 합니다.
-        /// Sets the preload count for a specific prefab in the pool using a Resources path.
+        /// Resources 경로 기반 풀에 대해 지정 수량만큼 프리로드를 수행합니다.
         /// </summary>
         public IPoolInfoReadOnly SetResourcesPreload(string resources, int count) => _preloadHandler.SetResourcesPreload(resources, count);
 
+        /// <summary>
+        /// 프리팹 기반 풀의 객체를 정리합니다.
+        /// </summary>
         public IPoolInfoReadOnly ClearPool(GameObject prefab) => _preloadHandler.ClearPool(prefab);
 
+        /// <summary>
+        /// 컴포넌트 프리팹 기반 풀의 객체를 정리합니다.
+        /// </summary>
         public IPoolInfoReadOnly ClearPool<T>(T prefab) where T : Component => _preloadHandler.ClearPool(prefab);
 
-        public IPoolInfoReadOnly ClearResourcesPool(string resources) => _preloadHandler.ClearResourcesPool(resources);
-        public IGenericPoolInfoReadOnly ClearGenericPool<T>() where T : class, IPoolGeneric, new() => _preloadHandler.ClearGenericPool<T>();
-        public void ClearPool(PoolInfo info) => _preloadHandler.ClearPool(info);
-        #endregion
-        #region GetPool
-        #region Common
         /// <summary>
-        /// 풀에서 오브젝트를 가져옵니다.
+        /// Resources 경로 기반 풀의 객체를 정리합니다.
+        /// </summary>
+        public IPoolInfoReadOnly ClearResourcesPool(string resources) => _preloadHandler.ClearResourcesPool(resources);
+
+        /// <summary>
+        /// 제네릭 타입 <typeparamref name="T"/> 기반 풀의 객체를 정리합니다.
+        /// </summary>
+        public IGenericPoolInfoReadOnly ClearGenericPool<T>() where T : class, IPoolGeneric, new() => _preloadHandler.ClearGenericPool<T>();
+
+        /// <summary>
+        /// 지정된 풀 정보를 직접 전달하여 정리합니다.
+        /// </summary>
+        public void ClearPool(PoolInfo info) => _preloadHandler.ClearPool(info);
+
+        #endregion
+
+        #region GetPool
+
+        #region Common
+
+        /// <summary>
+        /// 프리팹 기반 GameObject 인스턴스를 풀에서 가져옵니다.
         /// </summary>
         public GameObject Get(GameObject prefab) => _getHandler.Get(prefab);
+
         /// <summary>
-        /// 풀에서 오브젝트를 가져오고, 지정된 Transform에 위치시키며, 월드 포지션을 유지할지 여부를 설정합니다.
+        /// 프리팹 기반 GameObject 인스턴스를 가져와 지정된 트랜스폼에 배치합니다.
         /// </summary>
         public GameObject Get(GameObject prefab, Transform transform, bool worldPositionStay = false) => _getHandler.Get(prefab, transform, worldPositionStay);
+
         /// <summary>
-        /// 풀에서 오브젝트를 가져오고, 지정된 위치와 회전을 설정합니다.
+        /// 프리팹 기반 GameObject 인스턴스를 가져와 위치/회전을 설정합니다.
         /// </summary>
         public GameObject Get(GameObject prefab, Vector3 pos, Quaternion rot) => _getHandler.Get(prefab, pos, rot);
+
         /// <summary>
-        /// 풀에서 오브젝트를 가져오고, 해당 컴포넌트를 반환합니다.
+        /// 컴포넌트 프리팹 인스턴스를 풀에서 가져옵니다.
         /// </summary>
         public T Get<T>(T prefab) where T : Component => _getHandler.Get(prefab);
+
         /// <summary>
-        /// 풀에서 오브젝트를 가져오고, 해당 컴포넌트를 지정된 Transform에 위치시키며, 월드 포지션을 유지할지 여부를 설정합니다.
+        /// 컴포넌트 프리팹 인스턴스를 가져와 지정된 트랜스폼에 배치합니다.
         /// </summary>
         public T Get<T>(T prefab, Transform transform, bool worldPositionStay = false) where T : Component => _getHandler.Get(prefab, transform, worldPositionStay);
+
         /// <summary>
-        /// 풀에서 오브젝트를 가져오고, 해당 컴포넌트를 지정된 위치와 회전을 설정합니다.
+        /// 컴포넌트 프리팹 인스턴스를 가져와 위치/회전을 설정합니다.
         /// </summary>
         public T Get<T>(T prefab, Vector3 pos, Quaternion rot) where T : Component => _getHandler.Get(prefab, pos, rot);
+
         #endregion
+
         #region Resources
+
         /// <summary>
-        /// 풀에서 오브젝트를 가져옵니다.(Resources)
+        /// Resources 경로 기반 GameObject 인스턴스를 풀에서 가져옵니다.
         /// </summary>
-        /// <param name="resources"></param>
-        /// <returns></returns>
         public GameObject ResourcesGet(string resources) => _getHandler.ResourcesGet(resources);
+
         /// <summary>
-        ///  풀에서 오브젝트를 가져오고, 지정된 Transform에 위치시키며, 월드 포지션을 유지할지 여부를 설정합니다.(Resources)
+        /// Resources 경로 기반 GameObject 인스턴스를 가져와 지정된 트랜스폼에 배치합니다.
         /// </summary>
         public GameObject ResourcesGet(string resources, Transform transform, bool worldPositionStay = false) => _getHandler.ResourcesGet(resources, transform, worldPositionStay);
 
         /// <summary>
-        /// 풀에서 오브젝트를 가져오고, 지정된 위치와 회전을 설정합니다.(Resources)
+        /// Resources 경로 기반 GameObject 인스턴스를 가져와 위치/회전을 설정합니다.
         /// </summary>
         public GameObject ResourcesGet(string resources, Vector3 pos, Quaternion rot) => _getHandler.ResourcesGet(resources, pos, rot);
+
         /// <summary>
-        /// 풀에서 오브젝트를 가져오고, 해당 컴포넌트를 반환합니다.
+        /// Resources 경로 기반 컴포넌트 인스턴스를 풀에서 가져옵니다.
         /// </summary>
         public T ResourcesGet<T>(string resources) where T : Component => _getHandler.ResourcesGet<T>(resources);
 
         /// <summary>
-        /// 풀에서 오브젝트를 가져오고, 해당 컴포넌트를 지정된 Transform에 위치시키며, 월드 포지션을 유지할지 여부를 설정합니다.
+        /// Resources 경로 기반 컴포넌트 인스턴스를 가져와 지정된 트랜스폼에 배치합니다.
         /// </summary>
         public T ResourcesGet<T>(string resources, Transform transform, bool worldPositionStay = false) where T : Component => _getHandler.ResourcesGet<T>(resources, transform, worldPositionStay);
 
         /// <summary>
-        /// 풀에서 오브젝트를 가져오고, 해당 컴포넌트를 지정된 위치와 회전을 설정합니다.
+        /// Resources 경로 기반 컴포넌트 인스턴스를 가져와 위치/회전을 설정합니다.
         /// </summary>
         public T ResourcesGet<T>(string resources, Vector3 pos, Quaternion rot) where T : Component => _getHandler.ResourcesGet<T>(resources, pos, rot);
+
         #endregion
+
         #region Generic
-        public T GenericPool<T>() where T : class, IPoolGeneric, new() => _getHandler.GenericGet<T>();
-        #endregion
-        #endregion
-        #region ReturnPool
-        /// <summary>
-        /// 풀에서 오브젝트를 반환합니다. 반환된 오브젝트는 비활성화되고, 풀에 다시 추가됩니다.
-        /// </summary>
-        public IPoolInfoReadOnly Return(GameObject instance) => _returnHandler.Return(instance);
-        /// <summary>
-        /// 풀에서 오브젝트를 반환합니다. 반환된 오브젝트는 비활성화되고, 풀에 다시 추가됩니다.
-        /// </summary>
-        public IPoolInfoReadOnly Return<T>(T instance) where T : Component => _returnHandler.Return(instance);
-        /// <summary>
-        /// 풀에서 오브젝트를 반환합니다. 반환된 오브젝트는 비활성화되고, 지정된 지연 시간 후에 풀에 다시 추가됩니다.
-        /// </summary>
-        public void Return(GameObject instance, float delay) => _returnHandler.Return(instance, delay);
-        /// <summary>
-        /// 풀에서 오브젝트를 반환합니다. 반환된 오브젝트는 비활성화되고, 지정된 지연 시간 후에 풀에 다시 추가됩니다.
-        /// </summary>
-        public void Return<T>(T instance, float delay) where T : Component => _returnHandler.Return(instance, delay);
-        public IGenericPoolInfoReadOnly GenericReturn<T>(T instance) where T : class, IPoolGeneric, new() => _returnHandler.GenericReturn(instance);
-        public void GenericReturn<T>(T instance, float delay) where T : class, IPoolGeneric, new() => _returnHandler.GenericReturn(instance, delay);
-        #endregion    
-        public PoolInfo FindPool(GameObject poolPrefab) => _findPoolHandler.FindPool(poolPrefab);
-        public PoolInfo FindResourcesPool(string resources) => _findPoolHandler.FindResourcesPool(resources);
-        public GenericPoolInfo FindGenericPool<T>() where T : class, IPoolGeneric, new() => _findPoolHandler.FindGenericPool<T>();
-        public bool FindObject(PoolInfo info) => _findPoolHandler.FindObject(info);
-        public bool FindGeneric<T>(GenericPoolInfo poolInfo) where T : class, IPoolGeneric, new() => _findPoolHandler.FindGeneric<T>(poolInfo);
-        public PoolInfo RegisterPool(GameObject poolPrefab, int prefabID) => _createPoolHandler.RegisterPool(poolPrefab, prefabID);
-        public GenericPoolInfo RegisterGenericPool<T>() where T : class, IPoolGeneric, new() => _createPoolHandler.RegisterGenericPool<T>();
-        public PooledObject AddPoolObjectComponent(GameObject instance, PoolInfo info) => _createPoolHandler.AddPoolObjectComponent(instance, info);
-        public void SleepRigidbody(PooledObject instance) => _setRbHandler.SleepRigidbody(instance);
-        public void WakeUpRigidBody(PooledObject instance) => _setRbHandler.WakeUpRigidBody(instance);
-        public IEnumerator IsActiveRoutine(int id) => _lifeHandler.IsActiveRoutine(id);
-        public IEnumerator IsActiveGenericRoutine<T>() where T : class, IPoolGeneric, new() => _lifeHandler.IsActiveGenericRoutine<T>();
 
         /// <summary>
-        /// 지정된 시간만큼 대기하는 WaitForSeconds 객체를 반환합니다. 이미 생성된 객체가 있으면 재사용합니다.
+        /// 제네릭 풀에서 타입 <typeparamref name="T"/> 인스턴스를 가져옵니다.
+        /// </summary>
+        public T GenericPool<T>() where T : class, IPoolGeneric, new() => _getHandler.GenericGet<T>();
+
+        #endregion
+
+        #endregion
+
+        #region ReturnPool
+
+        /// <summary>
+        /// GameObject 인스턴스를 풀에 반환합니다.
+        /// </summary>
+        public IPoolInfoReadOnly Return(GameObject instance) => _returnHandler.Return(instance);
+
+        /// <summary>
+        /// 컴포넌트 인스턴스를 풀에 반환합니다.
+        /// </summary>
+        public IPoolInfoReadOnly Return<T>(T instance) where T : Component => _returnHandler.Return(instance);
+
+        /// <summary>
+        /// 지정된 지연 시간 후 GameObject 인스턴스를 풀에 반환합니다.
+        /// </summary>
+        public void Return(GameObject instance, float delay) => _returnHandler.Return(instance, delay);
+
+        /// <summary>
+        /// 지정된 지연 시간 후 컴포넌트 인스턴스를 풀에 반환합니다.
+        /// </summary>
+        public void Return<T>(T instance, float delay) where T : Component => _returnHandler.Return(instance, delay);
+
+        /// <summary>
+        /// 제네릭 풀 인스턴스를 반환하고 풀 정보를 반환합니다.
+        /// </summary>
+        public IGenericPoolInfoReadOnly GenericReturn<T>(T instance) where T : class, IPoolGeneric, new() => _returnHandler.GenericReturn(instance);
+
+        /// <summary>
+        /// 지정된 지연 시간 후 제네릭 풀 인스턴스를 반환합니다.
+        /// </summary>
+        public void GenericReturn<T>(T instance, float delay) where T : class, IPoolGeneric, new() => _returnHandler.GenericReturn(instance, delay);
+
+        #endregion
+
+        /// <summary>
+        /// 프리팹 기반 풀 정보를 찾거나 생성합니다.
+        /// </summary>
+        public PoolInfo FindPool(GameObject poolPrefab) => _findPoolHandler.FindPool(poolPrefab);
+
+        /// <summary>
+        /// Resources 경로 기반 풀 정보를 찾거나 생성합니다.
+        /// </summary>
+        public PoolInfo FindResourcesPool(string resources) => _findPoolHandler.FindResourcesPool(resources);
+
+        /// <summary>
+        /// 제네릭 타입 기반 풀 정보를 찾거나 생성합니다.
+        /// </summary>
+        public GenericPoolInfo FindGenericPool<T>() where T : class, IPoolGeneric, new() => _findPoolHandler.FindGenericPool<T>();
+
+        /// <summary>
+        /// 지정된 풀에서 유효한 GameObject 인스턴스가 존재하는지 검사합니다.
+        /// </summary>
+        public bool FindObject(PoolInfo info) => _findPoolHandler.FindObject(info);
+
+        /// <summary>
+        /// 지정된 제네릭 풀에서 유효한 인스턴스가 존재하는지 검사합니다.
+        /// </summary>
+        public bool FindGeneric<T>(GenericPoolInfo poolInfo) where T : class, IPoolGeneric, new() => _findPoolHandler.FindGeneric<T>(poolInfo);
+
+        /// <summary>
+        /// 새 GameObject 풀을 생성하고 등록합니다.
+        /// </summary>
+        public PoolInfo RegisterPool(GameObject poolPrefab, int prefabID) => _createPoolHandler.RegisterPool(poolPrefab, prefabID);
+
+        /// <summary>
+        /// 새 제네릭 풀을 생성하고 등록합니다.
+        /// </summary>
+        public GenericPoolInfo RegisterGenericPool<T>() where T : class, IPoolGeneric, new() => _createPoolHandler.RegisterGenericPool<T>();
+
+        /// <summary>
+        /// 인스턴스에 <see cref="PooledObject"/> 컴포넌트를 부착하고 풀 정보에 등록합니다.
+        /// </summary>
+        public PooledObject AddPoolObjectComponent(GameObject instance, PoolInfo info) => _createPoolHandler.AddPoolObjectComponent(instance, info);
+
+        /// <summary>
+        /// 풀 오브젝트의 Rigidbody / Rigidbody2D를 Sleep 상태로 전환합니다.
+        /// </summary>
+        public void SleepRigidbody(PooledObject instance) => _setRbHandler.SleepRigidbody(instance);
+
+        /// <summary>
+        /// 풀 오브젝트의 Rigidbody / Rigidbody2D를 깨웁니다.
+        /// </summary>
+        public void WakeUpRigidBody(PooledObject instance) => _setRbHandler.WakeUpRigidBody(instance);
+
+        /// <summary>
+        /// 지정된 시간에 대한 <see cref="WaitForSeconds"/> 인스턴스를 캐싱하여 반환합니다.
         /// </summary>
         public WaitForSeconds Second(float time)
         {
-            float normalize = Mathf.Round(time * 100f) * 0.01f;
+            float normalize = Mathf.Round(time * 100f) * 0.01f; // 소수 둘째 자리까지 정규화
 
             if (DelayDic.ContainsKey(normalize) == false)
             {
@@ -249,16 +342,9 @@ namespace AutoPool_Tool
             return DelayDic[normalize];
         }
 
-        private void SetSingleTon()
-        {
-            if (_instance == null)
-            {
-                _instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-                Destroy(gameObject);
-        }
+        /// <summary>
+        /// 각 역할별 내부 핸들러 인스턴스를 생성합니다.
+        /// </summary>
         private void SetHandler()
         {
             _getHandler = new AutoPoolGetHandler(this);
@@ -267,14 +353,20 @@ namespace AutoPool_Tool
             _findPoolHandler = new AutoPoolFindPoolHandler(this);
             _createPoolHandler = new AutoPoolCreatePoolHandler(this);
             _setRbHandler = new AutoPoolSetRbHandler(this);
-            _lifeHandler = new AutoPoolLifeHandler(this);
         }
 
+        /// <summary>
+        /// 씬 로드 전에 애플리케이션 종료 플래그를 초기화합니다.
+        /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void OnRuntimeLoad()
         {
             s_isApplicationQuit = false;
         }
+
+        /// <summary>
+        /// 애플리케이션 종료 시 추가 풀 생성이 되지 않도록 플래그를 설정합니다.
+        /// </summary>
         private void OnApplicationQuit()
         {
             s_isApplicationQuit = true;
