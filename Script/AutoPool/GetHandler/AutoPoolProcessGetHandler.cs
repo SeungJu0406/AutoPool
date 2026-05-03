@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static PlasticGui.WorkspaceWindow.Merge.MergeInProgress;
 
 namespace AutoPool_Tool
 {
