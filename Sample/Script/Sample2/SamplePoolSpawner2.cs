@@ -28,7 +28,14 @@ namespace AutoPool_Tool
         // Clears the pool for a specific SampleObject.
         private IPoolInfoReadOnly ClearPool(SampleObject sample)
         {
-            return ObjectPool.ClearPool(sample).OnDebug("ClearPool Test");
+            IPoolInfoReadOnly poolInfo = ObjectPool.ClearPool(sample).OnDebug("ClearPool Test");
+
+            if(_sampleQueue.Count > 0)
+            {
+                _sampleQueue.Clear();
+            }
+
+            return poolInfo;
         }
 
         // Spawns a SampleObject from the pool and sets its parent.
