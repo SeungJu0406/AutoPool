@@ -62,7 +62,7 @@ namespace AutoPool_Tool
         /// </summary>
         public static T ReturnWhenGeneric<T>(this T pooledObj, Func<bool> condition) where T : class, IPoolGeneric, new()
         {
-            ObjectPool.Instance.StartCoroutine(ReuturnWhenCoroutine(pooledObj, condition));         // 1) 제네릭 객체를 대상으로 하는 코루틴 실행
+            ObjectPool.Instance.StartCoroutine(ReturnWhenCoroutine(pooledObj, condition));          // 1) 제네릭 객체를 대상으로 하는 코루틴 실행
             return pooledObj;                                                                      // 2) 메서드 체이닝 지원
         }
 
@@ -253,7 +253,7 @@ namespace AutoPool_Tool
         /// <summary>
         /// 조건이 참이 될 때까지 대기한 뒤 제네릭 풀 객체를 반환하는 코루틴입니다.
         /// </summary>
-        static IEnumerator ReuturnWhenCoroutine<T>(T pooledObj, Func<bool> condition) where T : class, IPoolGeneric, new()
+        static IEnumerator ReturnWhenCoroutine<T>(T pooledObj, Func<bool> condition) where T : class, IPoolGeneric, new()
         {
             while (!condition())                                                                   // 1) 조건이 거짓인 동안 계속 대기
             {
