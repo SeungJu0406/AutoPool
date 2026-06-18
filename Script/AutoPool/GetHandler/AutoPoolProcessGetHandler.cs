@@ -37,7 +37,8 @@ namespace AutoPool_Tool
 
                 instance.transform.position = Vector3.zero;            // 5) ��ġ �ʱ�ȭ
                 instance.transform.rotation = Quaternion.identity;     // 6) ȸ�� �ʱ�ȭ
-                instance.transform.SetParent(null);                    // 7) �θ� ���� (��Ʈ�� �̵�)
+                instance.transform.localScale = info.Prefab.transform.localScale; // 7) ��ĸ�� �ʱ�ȭ
+                instance.transform.SetParent(null);                    // 8) �θ� ���� (��Ʈ�� �̵�)
                 instance.gameObject.SetActive(true);                   // 8) Ȱ��ȭ
                 SceneManager.MoveGameObjectToScene(                    // 9) ���� Ȱ�� ������ �̵�
                     instance,
@@ -69,6 +70,8 @@ namespace AutoPool_Tool
 
                 _autoPool.WakeUpRigidBody(poolObject);                 // 4) Rigidbody/2D �����
                 instance.transform.SetParent(transform, worldPositionStay); // 5) worldPositionStay ����踦 Unity ǥ�� ���ǿ� ����
+                if (!worldPositionStay)
+                    instance.transform.localScale = info.Prefab.transform.localScale; // 6) ��ĸ�� �ʱ�ȭ
 
                 instance.gameObject.SetActive(true);                   // 7) Ȱ��ȭ
             }
@@ -101,7 +104,8 @@ namespace AutoPool_Tool
 
                 _autoPool.WakeUpRigidBody(poolObject);                 // 4) Rigidbody/2D �����
                 instance.transform.position = pos;                     // 5) ��ġ ����
-                instance.transform.rotation = rot;                     // 6) ȸ�� ����
+                instance.transform.rotation = rot;     
+                instance.transform.localScale = info.Prefab.transform.localScale;                // 6) ȸ�� ����
                 instance.transform.SetParent(null);                    // 7) �θ� ����
                 instance.gameObject.SetActive(true);                   // 8) Ȱ��ȭ
                 SceneManager.MoveGameObjectToScene(                    // 9) ���� Ȱ�� ������ �̵�
