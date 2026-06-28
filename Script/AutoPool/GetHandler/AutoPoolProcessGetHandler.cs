@@ -148,6 +148,7 @@ namespace AutoPool_Tool
 
         private void SetActiveCount(PoolInfo info)
         {
+            info.IsActive = true;
             info.ActiveCount++;
             if (info.PoolCount < info.ActiveCount)
                 info.PoolCount = info.ActiveCount;
@@ -155,6 +156,7 @@ namespace AutoPool_Tool
 
         private void SetActiveCount(GenericPoolInfo info)
         {
+            info.IsActive = true;
             info.ActiveCount++;
             if (info.PoolCount < info.ActiveCount)
                 info.PoolCount = info.ActiveCount;

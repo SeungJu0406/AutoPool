@@ -49,6 +49,7 @@ namespace AutoPool_Tool
                 return null;
             }
 
+            info.IsActive = true;
             while (info.PoolCount < count)
             {
                 GameObject instance = GameObject.Instantiate(info.Prefab);

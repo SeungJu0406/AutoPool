@@ -24,6 +24,9 @@ namespace AutoPool_Tool
 
             DrawInspectorObjectPool();
             DrawInspectorGenericPool();
+
+            if (Application.isPlaying)
+                Repaint();
         }
         
 
