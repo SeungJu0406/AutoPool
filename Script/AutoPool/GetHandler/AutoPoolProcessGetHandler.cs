@@ -22,22 +22,22 @@ namespace AutoPool_Tool
         /// Pops a pooled instance and activates it at world origin, or instantiates a new one
         /// if the pool is empty.
         /// </summary>
-        public GameObject ProcessGet(PoolInfo info)
+        public PooledObject ProcessGet(PoolInfo info)
         {
             GameObject instance = null;
             PooledObject poolObject = null;
 
             if (_autoPool.FindObject(info))
             {
-                instance = info.Pool.Pop();
-                poolObject = instance.GetComponent<PooledObject>();
+                poolObject = info.Pool.Pop();
+                instance = poolObject.gameObject;
                 _autoPool.WakeUpRigidBody(poolObject);
 
                 instance.transform.position = Vector3.zero;
                 instance.transform.rotation = Quaternion.identity;
                 instance.transform.localScale = info.Prefab.transform.localScale;
                 instance.transform.SetParent(null);
-                instance.gameObject.SetActive(true);
+                instance.SetActive(true);
                 SceneManager.MoveGameObjectToScene(instance, SceneManager.GetActiveScene());
             }
             else
@@ -48,29 +48,29 @@ namespace AutoPool_Tool
 
             poolObject.OnCreateFromPool();
             SetActiveCount(info);
-            return instance;
+            return poolObject;
         }
 
         /// <summary>
         /// Pops a pooled instance and places it under <paramref name="transform"/>,
         /// or instantiates a new one via Unity's Instantiate overload.
         /// </summary>
-        public GameObject ProcessGet(PoolInfo info, Transform transform, bool worldPositionStay = false)
+        public PooledObject ProcessGet(PoolInfo info, Transform transform, bool worldPositionStay = false)
         {
             GameObject instance = null;
             PooledObject poolObject = null;
 
             if (_autoPool.FindObject(info))
             {
-                instance = info.Pool.Pop();
-                poolObject = instance.GetComponent<PooledObject>();
+                poolObject = info.Pool.Pop();
+                instance = poolObject.gameObject;
                 _autoPool.WakeUpRigidBody(poolObject);
 
                 instance.transform.SetParent(transform, worldPositionStay);
                 if (!worldPositionStay)
                     instance.transform.localScale = info.Prefab.transform.localScale;
 
-                instance.gameObject.SetActive(true);
+                instance.SetActive(true);
             }
             else
             {
@@ -80,29 +80,29 @@ namespace AutoPool_Tool
 
             poolObject.OnCreateFromPool();
             SetActiveCount(info);
-            return instance;
+            return poolObject;
         }
 
         /// <summary>
         /// Pops a pooled instance and places it at the given position and rotation,
         /// or instantiates a new one.
         /// </summary>
-        public GameObject ProcessGet(PoolInfo info, Vector3 pos, Quaternion rot)
+        public PooledObject ProcessGet(PoolInfo info, Vector3 pos, Quaternion rot)
         {
             GameObject instance = null;
             PooledObject poolObject = null;
 
             if (_autoPool.FindObject(info))
             {
-                instance = info.Pool.Pop();
-                poolObject = instance.GetComponent<PooledObject>();
+                poolObject = info.Pool.Pop();
+                instance = poolObject.gameObject;
                 _autoPool.WakeUpRigidBody(poolObject);
 
                 instance.transform.position = pos;
                 instance.transform.rotation = rot;
                 instance.transform.localScale = info.Prefab.transform.localScale;
                 instance.transform.SetParent(null);
-                instance.gameObject.SetActive(true);
+                instance.SetActive(true);
                 SceneManager.MoveGameObjectToScene(instance, SceneManager.GetActiveScene());
             }
             else
@@ -113,7 +113,7 @@ namespace AutoPool_Tool
 
             poolObject.OnCreateFromPool();
             SetActiveCount(info);
-            return instance;
+            return poolObject;
         }
 
         /// <summary>

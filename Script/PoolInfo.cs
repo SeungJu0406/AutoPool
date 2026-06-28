@@ -17,7 +17,7 @@ namespace AutoPool_Tool
         /// <summary>
         /// Stack of inactive instances waiting to be reused.
         /// </summary>
-        public Stack<GameObject> Pool;
+        public Stack<PooledObject> Pool;
 
         /// <summary>
         /// Source prefab used to instantiate new instances.
@@ -55,7 +55,7 @@ namespace AutoPool_Tool
         public int ActiveCount;
 
         bool IPoolInfoReadOnly.IsMock => IsMock;
-        Stack<GameObject> IPoolInfoReadOnly.Pool => Pool;
+        Stack<PooledObject> IPoolInfoReadOnly.Pool => Pool;
         GameObject IPoolInfoReadOnly.Prefab => Prefab;
         string IPoolInfoReadOnly.Name => Prefab.name;
         Transform IPoolInfoReadOnly.Parent => Parent;

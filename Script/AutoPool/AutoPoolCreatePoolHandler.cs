@@ -25,7 +25,7 @@ namespace AutoPool_Tool
             Transform newParent = new GameObject(poolPrefab.name).transform;
             newParent.SetParent(_autoPool.transform, true);
 
-            Stack<GameObject> newPool = new Stack<GameObject>();
+            Stack<PooledObject> newPool = new Stack<PooledObject>();
 
             PoolInfo newPoolInfo = GetPoolInfo(newPool, poolPrefab, newParent);
             _autoPool.PoolDic.Add(prefabID, newPoolInfo);
@@ -61,7 +61,7 @@ namespace AutoPool_Tool
             return poolObject;
         }
 
-        private PoolInfo GetPoolInfo(Stack<GameObject> pool, GameObject prefab, Transform parent)
+        private PoolInfo GetPoolInfo(Stack<PooledObject> pool, GameObject prefab, Transform parent)
         {
             PoolInfo info = new PoolInfo();
             info.Pool = pool;

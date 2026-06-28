@@ -54,7 +54,7 @@ namespace AutoPool_Tool
                 GameObject instance = GameObject.Instantiate(info.Prefab);
                 PooledObject poolObject = _autoPool.AddPoolObjectComponent(instance, info);
                 instance.transform.SetParent(info.Parent);
-                info.Pool.Push(instance);
+                info.Pool.Push(poolObject);
 
                 // Temporarily activate if needed so OnDisable fires and ActiveCount adjusts correctly.
                 if (instance.gameObject.activeSelf)
@@ -110,7 +110,7 @@ namespace AutoPool_Tool
         public void ClearPool(PoolInfo info)
         {
             info.OnPoolDormant?.Invoke();
-            info.Pool = new Stack<GameObject>();
+            info.Pool = new Stack<PooledObject>();
             info.IsActive = false;
         }
 

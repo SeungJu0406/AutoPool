@@ -16,9 +16,9 @@ namespace AutoPool_Tool
         public bool IsMock { get; }
 
         /// <summary>
-        /// Stack of inactive GameObject instances waiting for reuse.
+        /// Stack of inactive PooledObject instances waiting for reuse.
         /// </summary>
-        public Stack<GameObject> Pool { get; }
+        public Stack<PooledObject> Pool { get; }
 
         /// <summary>
         /// The source prefab this pool was created from.

@@ -78,13 +78,13 @@ namespace AutoPool_Tool
         #endregion
 
         /// <summary>Pops an instance from the pool stack and activates it at default position/rotation.</summary>
-        public GameObject ProcessGet(PoolInfo info) => _processGetHandler.ProcessGet(info);
+        public PooledObject ProcessGet(PoolInfo info) => _processGetHandler.ProcessGet(info);
 
         /// <summary>Pops an instance from the pool stack and parents it under <paramref name="transform"/>.</summary>
-        public GameObject ProcessGet(PoolInfo info, Transform transform, bool worldPositionStay = false) => _processGetHandler.ProcessGet(info, transform, worldPositionStay);
+        public PooledObject ProcessGet(PoolInfo info, Transform transform, bool worldPositionStay = false) => _processGetHandler.ProcessGet(info, transform, worldPositionStay);
 
         /// <summary>Pops an instance from the pool stack and places it at the given position/rotation.</summary>
-        public GameObject ProcessGet(PoolInfo info, Vector3 pos, Quaternion rot) => _processGetHandler.ProcessGet(info, pos, rot);
+        public PooledObject ProcessGet(PoolInfo info, Vector3 pos, Quaternion rot) => _processGetHandler.ProcessGet(info, pos, rot);
 
         /// <summary>Pops or creates a generic instance of type <typeparamref name="T"/>.</summary>
         public T ProcessGenericGet<T>(GenericPoolInfo poolInfo) where T : class, IPoolGeneric, new() => _processGetHandler.ProcessGenericGet<T>(poolInfo);

@@ -92,7 +92,7 @@ namespace AutoPool_Tool
         {
             if (info == null) return false;
 
-            GameObject instance = null;
+            PooledObject instance = null;
             while (true)
             {
                 if (info.Pool.Count <= 0)

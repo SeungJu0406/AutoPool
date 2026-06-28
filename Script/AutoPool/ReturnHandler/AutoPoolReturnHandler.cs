@@ -172,7 +172,7 @@ namespace AutoPool_Tool
             _autoPool.SleepRigidbody(poolObject);
             poolObject.OnReturnToPool();
             instance.gameObject.SetActive(false);
-            info.Pool.Push(instance.gameObject);
+            info.Pool.Push(poolObject);
 
             return info;
         }

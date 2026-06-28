@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AutoPool_Tool
@@ -35,11 +36,29 @@ namespace AutoPool_Tool
         /// </summary>
         public event Action OnReturn;
 
+        Dictionary<Type, Component> _componentCache;
+
         private void Awake()
         {
+            _componentCache = new Dictionary<Type, Component>();
             _poolObject = GetComponent<IPooledObject>();
             CachedRb = GetComponent<Rigidbody>();
             CachedRb2D = GetComponent<Rigidbody2D>();
+        }
+
+        /// <summary>
+        /// Returns the component of type <typeparamref name="T"/>, caching it on first access
+        /// to avoid repeated GetComponent calls on subsequent pool retrievals.
+        /// </summary>
+        public T GetCachedComponent<T>() where T : Component
+        {
+            Type type = typeof(T);
+            if (!_componentCache.TryGetValue(type, out Component cached))
+            {
+                cached = GetComponent<T>();
+                _componentCache[type] = cached;
+            }
+            return (T)cached;
         }
 
         private void OnDisable()
