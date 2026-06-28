@@ -5,15 +5,13 @@ using UnityEngine;
 namespace AutoPool_Tool
 {
     /// <summary>
-    /// Ǯ�� ���� ��ȯ(���/����) �� ���׸� Ǯ ��ȯ�� ó���ϴ� �ڵ鷯�Դϴ�.
+    /// Handles returning GameObject and generic instances to the pool,
+    /// both immediately and after a timed delay.
     /// </summary>
     public class AutoPoolReturnHandler
     {
         MainAutoPool _autoPool;
 
-        /// <summary>
-        /// ���� Ǯ �ν��Ͻ��� �޾� ��ȯ �ڵ鷯�� �ʱ�ȭ�մϴ�.
-        /// </summary>
         public AutoPoolReturnHandler(MainAutoPool autoPool)
         {
             _autoPool = autoPool;
@@ -21,24 +19,22 @@ namespace AutoPool_Tool
 
         #region ReturnPool
 
-        /// <summary>
-        /// GameObject �ν��Ͻ��� Ǯ�� ��� ��ȯ�մϴ�.
-        /// </summary>
+        /// <summary>Returns a GameObject instance to the pool immediately.</summary>
         public IPoolInfoReadOnly Return(GameObject instance)
         {
             return ProcessReturn(instance.gameObject);
         }
 
-        /// <summary>
-        /// ������Ʈ �ν��Ͻ��� ������ GameObject�� Ǯ�� ��� ��ȯ�մϴ�.
-        /// </summary>
+        /// <summary>Returns a Component's GameObject to the pool immediately.</summary>
         public IPoolInfoReadOnly Return<T>(T instance) where T : Component
         {
             return ProcessReturn(instance.gameObject);
         }
 
         /// <summary>
-        /// ������ ���� �ð� �� GameObject �ν��Ͻ��� Ǯ�� ��ȯ�մϴ�.
+        /// Starts a coroutine that returns <paramref name="instance"/> to the pool after
+        /// <paramref name="delay"/> seconds. If the object is returned early (e.g. by
+        /// SetActive(false)) the coroutine is cancelled to avoid a double-return.
         /// </summary>
         public void Return(GameObject instance, float delay)
         {
@@ -51,144 +47,132 @@ namespace AutoPool_Tool
             if (pooledObject == null)
                 return;
 
-            CoroutineRef coroutineRef = new CoroutineRef();                                   // 1) �ڷ�ƾ ������ ���� ���� ����
-            coroutineRef.coroutine = _autoPool.StartCoroutine(                               // 2) ���� ��ȯ �ڷ�ƾ ����
+            CoroutineRef coroutineRef = new CoroutineRef();
+            coroutineRef.coroutine = _autoPool.StartCoroutine(
                 ReturnRoutine(instance, delay, coroutineRef));
 
             System.Action callback = null;
             callback = () =>
             {
-                if (coroutineRef.coroutine != null)                                          // 3) �̹� ��ȯ�Ǿ����� �ڷ�ƾ ����
+                if (coroutineRef.coroutine != null)
                 {
                     _autoPool.StopCoroutine(coroutineRef.coroutine);
                     coroutineRef.coroutine = null;
                 }
-                pooledObject.OnReturn -= callback;                                           // 4) �̺�Ʈ���� �ݹ� ����
+                pooledObject.OnReturn -= callback;
             };
 
-            pooledObject.OnReturn += callback;                                               // 5) ������Ʈ�� ���� ��Ȱ��ȭ�� �� �ڷ�ƾ ����
+            pooledObject.OnReturn += callback;
         }
 
-        /// <summary>
-        /// ������ ���� �ð� �� ������Ʈ �ν��Ͻ��� ������ GameObject�� Ǯ�� ��ȯ�մϴ�.
-        /// </summary>
+        /// <summary>Returns a Component's GameObject to the pool after <paramref name="delay"/> seconds.</summary>
         public void Return<T>(T instance, float delay) where T : Component
         {
             Return(instance.gameObject, delay);
         }
 
-        /// <summary>
-        /// ���׸� Ǯ �ν��Ͻ��� ��� ��ȯ�մϴ�.
-        /// </summary>
+        /// <summary>Returns a generic instance to the pool immediately.</summary>
         public IGenericPoolInfoReadOnly GenericReturn<T>(T instance) where T : class, IPoolGeneric, new()
         {
             if (instance == null)
                 return null;
 
             IPoolGeneric poolGeneric = (IPoolGeneric)instance;
-            if (poolGeneric.Pool.IsActive == false)                                         // �̹� ��Ȱ�� ���¸� �ߺ� ��ȯ ����
+            if (poolGeneric.Pool.IsActive == false)
                 return null;
 
-            GenericPoolInfo genericPool = _autoPool.FindGenericPool<T>();                   // 1) Ÿ�� T ��� ���׸� Ǯ ã��
+            GenericPoolInfo genericPool = _autoPool.FindGenericPool<T>();
             if (genericPool == null)
             {
                 Debug.LogError($"Generic Pool for {typeof(T)} not found.");
                 return null;
             }
 
-            poolGeneric.Pool.IsActive = false;                                              // 2) ���� ��ü Ȱ�� �÷��� ����
-            genericPool.ActiveCount--;                                                      // 3) Ȱ�� ī��Ʈ ����
-            genericPool.Pool.Push(instance);                                                // 4) Ǯ ���ÿ� Ǫ��
-            poolGeneric.OnReturnToPool();                                                   // 5) ���� ��ȯ �ݹ� ����
-            poolGeneric.Pool.Return();                                                      // 6) PoolGenericInfo.OnReturn �̺�Ʈ ȣ��
+            poolGeneric.Pool.IsActive = false;
+            genericPool.ActiveCount--;
+            genericPool.Pool.Push(instance);
+            poolGeneric.OnReturnToPool();
+            poolGeneric.Pool.Return();
 
             return genericPool;
         }
 
-        /// <summary>
-        /// ������ ���� �ð� �� ���׸� Ǯ �ν��Ͻ��� ��ȯ�մϴ�.
-        /// </summary>
+        /// <summary>Returns a generic instance to the pool after <paramref name="delay"/> seconds.</summary>
         public void GenericReturn<T>(T instance, float delay) where T : class, IPoolGeneric, new()
         {
             if (instance == null)
                 return;
 
             IPoolGeneric poolGeneric = (IPoolGeneric)instance;
-            if (poolGeneric.Pool.IsActive == false)                                         // �̹� ��Ȱ�� ���¸� �ߺ� ��ȯ ����
+            if (poolGeneric.Pool.IsActive == false)
                 return;
 
-            CoroutineRef coroutineRef = new CoroutineRef();                                 // 1) ���׸� ��ȯ�� �ڷ�ƾ ����
+            CoroutineRef coroutineRef = new CoroutineRef();
             coroutineRef.coroutine = _autoPool.StartCoroutine(
-                GenericReturnRoutine(instance, delay, coroutineRef));                       // 2) ���� ��ȯ �ڷ�ƾ ����
+                GenericReturnRoutine(instance, delay, coroutineRef));
         }
 
-        /// <summary>
-        /// ������ �ð� �� ���׸� �ν��Ͻ��� Ǯ�� ��ȯ�ϴ� �ڷ�ƾ�Դϴ�.
-        /// </summary>
         private IEnumerator GenericReturnRoutine<T>(T instance, float delay, CoroutineRef coroutineRef) where T : class, IPoolGeneric, new()
         {
-            yield return _autoPool.Second(delay);                                           // 1) ĳ�̵� WaitForSeconds ���
+            yield return _autoPool.Second(delay);
             if (instance == null)
                 yield break;
 
             IPoolGeneric poolGeneric = (IPoolGeneric)instance;
-            if (poolGeneric.Pool.IsActive == false)                                        // 2) �̹� ��ȯ�Ǿ����� ����
+            if (poolGeneric.Pool.IsActive == false)
                 yield break;
 
-            coroutineRef.coroutine = null;                                                 // 3) �ڷ�ƾ �Ϸ� ǥ��
-            GenericReturn(instance);                                                       // 4) ���� ��ȯ ó�� ����
+            coroutineRef.coroutine = null;
+            GenericReturn(instance);
         }
 
-        /// <summary>
-        /// ������ �ð� �� GameObject�� Ǯ�� ��ȯ�ϴ� �ڷ�ƾ�Դϴ�.
-        /// </summary>
         IEnumerator ReturnRoutine(GameObject instance, float delay, CoroutineRef coroutineRef = null)
         {
-            yield return _autoPool.Second(delay);                                          // 1) ĳ�̵� WaitForSeconds ���
+            yield return _autoPool.Second(delay);
             if (instance == null)
                 yield break;
 
-            if (instance.activeSelf == false)                                              // 2) �̹� ��Ȱ��ȭ�Ǿ����� ����
+            if (instance.activeSelf == false)
                 yield break;
 
-            coroutineRef.coroutine = null;                                                 // 3) �ڷ�ƾ �Ϸ� ǥ��
-            Return(instance);                                                              // 4) ���� ��ȯ ó�� ����
+            coroutineRef.coroutine = null;
+            Return(instance);
         }
 
         #endregion
 
         /// <summary>
-        /// GameObject�� ���� Ǯ�� ��ȯ�ϴ� ���� ó�� �����Դϴ�.
+        /// Core return logic: resets transform to prefab defaults, re-parents under the pool
+        /// root, sleeps physics, fires OnReturnToPool, deactivates the object, and pushes it
+        /// back onto the stack.
         /// </summary>
         private IPoolInfoReadOnly ProcessReturn(GameObject instance)
         {
             if (instance == null)
                 return null;
 
-            if (instance.activeSelf == false)                                              // �̹� ��Ȱ��ȭ�� ��� �ߺ� ��ȯ ����
+            if (instance.activeSelf == false)
                 return null;
 
-            PooledObject poolObject = instance.GetComponent<PooledObject>();               // 1) Ǯ ������ ���� PooledObject ����
+            PooledObject poolObject = instance.GetComponent<PooledObject>();
             if (poolObject == null)
                 return null;
 
-            PoolInfo info = _autoPool.FindPool(poolObject.PoolInfo.Prefab);               // 2) ���� ������ ���� Ǯ ���� ��ȸ
-            if (poolObject.PoolInfo != info)                                              // 3) ������ �ٸ��� �ֽ� PoolInfo�� ����ȭ
-            {
-                poolObject.PoolInfo = info;
-            }
+            PoolInfo info = _autoPool.FindPool(poolObject.PoolInfo.Prefab);
 
-            instance.transform.position = info.Prefab.transform.position;                  // 4) �������� ��ġ/ȸ��/�����Ϸ� ����
+            // Sync PoolInfo reference if the pool was recreated (e.g. after ClearPool).
+            if (poolObject.PoolInfo != info)
+                poolObject.PoolInfo = info;
+
+            instance.transform.position = info.Prefab.transform.position;
             instance.transform.rotation = info.Prefab.transform.rotation;
             instance.transform.localScale = info.Prefab.transform.localScale;
-            instance.transform.SetParent(info.Parent);                                     // 5) Ǯ ���� �θ� Ʈ���������� ����
+            instance.transform.SetParent(info.Parent);
 
-            _autoPool.SleepRigidbody(poolObject);                                          // 6) ���� ���� Sleep ó��
-
-            poolObject.OnReturnToPool();                                                   // 7) IPooledObject ��ȯ �ݹ� ����
-
-            instance.gameObject.SetActive(false);                                          // 8) ������Ʈ ��Ȱ��ȭ
-            info.Pool.Push(instance.gameObject);                                           // 9) Ǯ ���ÿ� Ǫ��
+            _autoPool.SleepRigidbody(poolObject);
+            poolObject.OnReturnToPool();
+            instance.gameObject.SetActive(false);
+            info.Pool.Push(instance.gameObject);
 
             return info;
         }

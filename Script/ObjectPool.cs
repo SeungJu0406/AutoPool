@@ -3,155 +3,123 @@ using UnityEngine;
 namespace AutoPool_Tool
 {
     /// <summary>
-    /// �������� ���� ������ ���� ��ü Ǯ ����������, Unity ��ü �� ���׸� Ǯ�� ���� ���� API�� �����մϴ�.
+    /// Scene-wide static facade for all pooling operations.
+    /// Automatically creates the underlying MainAutoPool when first accessed.
     /// </summary>
     public static class ObjectPool
     {
         /// <summary>
-        /// ���ο��� ����ϴ� ���� Ǯ �ν��Ͻ��Դϴ�. �ʿ� �� �ڵ����� �����˴ϴ�.
+        /// The shared pool manager instance. Created on first access.
         /// </summary>
         public static MainAutoPool Instance
         {
             get
             {
                 if (s_objectPool == null)
-                {
                     CreatePool();
-                }
                 return s_objectPool;
             }
         }
 
-        /// <summary>
-        /// ���� Ǯ �ν��Ͻ� �����Դϴ�.
-        /// </summary>
         private static MainAutoPool s_objectPool;
 
         /// <summary>
-        /// ���� Ǯ�� ��ȿ�ϰ� �����ϴ��� �����Դϴ�.
+        /// True when the pool manager exists and has not been destroyed.
         /// </summary>
         public static bool HasPool => s_objectPool != null && !s_objectPool.Equals(null);
 
-        /// <summary>
-        /// �����տ� ���� Ǯ ������ �����ɴϴ�.
-        /// </summary>
+        /// <summary>Returns pool info for the given prefab.</summary>
         public static IPoolInfoReadOnly GetInfo(GameObject prefab)
         {
             CreatePool();
             return s_objectPool.GetInfo(prefab);
         }
 
-        /// <summary>
-        /// ������Ʈ �����տ� ���� Ǯ ������ �����ɴϴ�.
-        /// </summary>
+        /// <summary>Returns pool info for the given Component prefab.</summary>
         public static IPoolInfoReadOnly GetInfo<T>(T prefab) where T : Component
         {
             CreatePool();
             return s_objectPool.GetInfo(prefab);
         }
 
-        /// <summary>
-        /// �������� ���� ���� ������ �����մϴ�.
-        /// </summary>
+        /// <summary>Pre-warms the prefab pool to at least <paramref name="count"/> instances.</summary>
         public static IPoolInfoReadOnly SetPreload(GameObject prefab, int count)
         {
             CreatePool();
             return s_objectPool.SetPreload(prefab, count);
         }
 
-        /// <summary>
-        /// ������Ʈ �������� ���� ���� ������ �����մϴ�.
-        /// </summary>
+        /// <summary>Pre-warms the Component prefab pool to at least <paramref name="count"/> instances.</summary>
         public static IPoolInfoReadOnly SetPreload<T>(T prefab, int count) where T : Component
         {
             CreatePool();
             return s_objectPool.SetPreload(prefab, count);
         }
 
-        /// <summary>
-        /// �����հ� ����� Ǯ�� ���ϴ�.
-        /// </summary>
+        /// <summary>Destroys all pooled instances for the given prefab.</summary>
         public static IPoolInfoReadOnly ClearPool(GameObject prefab)
         {
             CreatePool();
             return s_objectPool.ClearPool(prefab);
         }
 
-        /// <summary>
-        /// ������Ʈ �����հ� ����� Ǯ�� ���ϴ�.
-        /// </summary>
+        /// <summary>Destroys all pooled instances for the given Component prefab.</summary>
         public static IPoolInfoReadOnly ClearPool<T>(T prefab) where T : Component
         {
             CreatePool();
             return s_objectPool.ClearPool(prefab);
         }
 
-        /// <summary>
-        /// ������ ��� GameObject�� Ǯ���� �����ɴϴ�.
-        /// </summary>
+        /// <summary>Retrieves a GameObject instance from the pool.</summary>
         public static GameObject Get(GameObject prefab)
         {
             CreatePool();
             return s_objectPool.Get(prefab);
         }
 
-        /// <summary>
-        /// ������ ��� GameObject�� ������ ������ Ʈ�������� ��ġ�մϴ�.
-        /// </summary>
+        /// <summary>Retrieves a GameObject instance and parents it under <paramref name="transform"/>.</summary>
         public static GameObject Get(GameObject prefab, Transform transform, bool worldPositionStay = default)
         {
             CreatePool();
             return s_objectPool.Get(prefab, transform, worldPositionStay);
         }
 
-        /// <summary>
-        /// ������ ��� GameObject�� ������ ��ġ�� ȸ���� �����մϴ�.
-        /// </summary>
+        /// <summary>Retrieves a GameObject instance at the given position and rotation.</summary>
         public static GameObject Get(GameObject prefab, Vector3 pos, Quaternion rot)
         {
             CreatePool();
             return s_objectPool.Get(prefab, pos, rot);
         }
 
-        /// <summary>
-        /// ������Ʈ ������ �ν��Ͻ��� Ǯ���� �����ɴϴ�.
-        /// </summary>
+        /// <summary>Retrieves a Component instance from the pool.</summary>
         public static T Get<T>(T prefab) where T : Component
         {
             CreatePool();
             return s_objectPool.Get(prefab);
         }
 
-        /// <summary>
-        /// ������Ʈ ������ �ν��Ͻ��� ������ ������ Ʈ�������� ��ġ�մϴ�.
-        /// </summary>
+        /// <summary>Retrieves a Component instance and parents it under <paramref name="transform"/>.</summary>
         public static T Get<T>(T prefab, Transform transform, bool worldPositionStay = default) where T : Component
         {
             CreatePool();
             return s_objectPool.Get(prefab, transform, worldPositionStay);
         }
 
-        /// <summary>
-        /// ������Ʈ ������ �ν��Ͻ��� ������ ��ġ�� ȸ���� �����մϴ�.
-        /// </summary>
+        /// <summary>Retrieves a Component instance at the given position and rotation.</summary>
         public static T Get<T>(T prefab, Vector3 pos, Quaternion rot) where T : Component
         {
             CreatePool();
             return s_objectPool.Get(prefab, pos, rot);
         }
 
-        /// <summary>
-        /// Resources ��� ��� ������Ʈ �ν��Ͻ��� ������ ��ġ�� ȸ���� �����մϴ�.
-        /// </summary>
+        /// <summary>Retrieves a Resources-path Component instance at the given position and rotation.</summary>
         public static T ResourcesGet<T>(string resouces, Vector3 pos, Quaternion rot) where T : Component
         {
             CreatePool();
             return s_objectPool.ResourcesGet<T>(resouces, pos, rot);
         }
 
-        /// <summary>
-        /// ���׸� Ǯ���� Ÿ�� <typeparamref name="T"/> �ν��Ͻ��� �����ɴϴ�.
-        /// </summary>
+        /// <summary>Retrieves a generic pool instance of type <typeparamref name="T"/>.</summary>
         public static T GenericPool<T>() where T : class, IPoolGeneric, new()
         {
             CreatePool();
@@ -159,49 +127,36 @@ namespace AutoPool_Tool
         }
 
         /// <summary>
-        /// GameObject �ν��Ͻ��� Ǯ�� ��ȯ�ϰų�, Ǯ�� ������ �ı��մϴ�.
+        /// Returns a GameObject to the pool, or destroys it if the pool no longer exists
+        /// (e.g. when called from an additively loaded scene after the host scene unloads).
         /// </summary>
         public static IPoolInfoReadOnly Return(GameObject instance)
         {
-            // 1. Ǯ�� ����ִٸ� ���� �ݳ�
             if (HasPool)
-            {
                 return s_objectPool.Return(instance);
-            }
 
-            // 2. [�߿�] Ǯ�� �׾��µ� �ݳ� ��û�� �� (Additive �� ������ ��)
-            // ������ �Ұ����ϹǷ� �����ϰ� �ı��Ͽ� ȭ�鿡�� ġ������
             if (instance != null)
-            {
                 GameObject.Destroy(instance);
-            }
 
             return null;
         }
 
         /// <summary>
-        /// ������Ʈ �ν��Ͻ��� Ǯ�� ��ȯ�ϰų�, Ǯ�� ������ �ı��մϴ�.
+        /// Returns a Component's GameObject to the pool, or destroys it if the pool no longer exists.
         /// </summary>
         public static IPoolInfoReadOnly Return<T>(T instance) where T : Component
         {
-            // 1. Ǯ�� ����ִٸ� ���� �ݳ�
             if (HasPool)
-            {
                 return s_objectPool.Return(instance);
-            }
 
-            // 2. [�߿�] Ǯ�� �׾��µ� �ݳ� ��û�� �� (Additive �� ������ ��)
-            // ������ �Ұ����ϹǷ� �����ϰ� �ı��Ͽ� ȭ�鿡�� ġ������
             if (instance != null)
-            {
                 GameObject.Destroy(instance);
-            }
 
             return null;
         }
 
         /// <summary>
-        /// ���� �ð� �� GameObject �ν��Ͻ��� Ǯ�� ��ȯ�ϰų�, Ǯ�� ������ ��� �ı��մϴ�.
+        /// Returns a GameObject to the pool after a delay, or destroys it immediately if the pool is gone.
         /// </summary>
         public static void Return(GameObject instance, float delay)
         {
@@ -211,15 +166,12 @@ namespace AutoPool_Tool
             }
             else
             {
-                // ���� �ݳ��� ���, �ڷ�ƾ�� ���� Ǯ�� �����Ƿ�
-                // �׳� ������ ���� ��� �ı��ϰų�, �ʿ��ϴٸ� ���� ó���� �ʿ�������
-                // ���� Ǯ�� ���� ��Ȳ�̸� ��� ������ �½��ϴ�.
                 if (instance != null) GameObject.Destroy(instance);
             }
         }
 
         /// <summary>
-        /// ���� �ð� �� ������Ʈ �ν��Ͻ��� Ǯ�� ��ȯ�ϰų�, Ǯ�� ������ ��� �ı��մϴ�.
+        /// Returns a Component's GameObject to the pool after a delay, or destroys it immediately if the pool is gone.
         /// </summary>
         public static void Return<T>(T instance, float delay) where T : Component
         {
@@ -229,32 +181,28 @@ namespace AutoPool_Tool
             }
             else
             {
-                // ���� �ݳ��� ���, �ڷ�ƾ�� ���� Ǯ�� �����Ƿ�
-                // �׳� ������ ���� ��� �ı��ϰų�, �ʿ��ϴٸ� ���� ó���� �ʿ�������
-                // ���� Ǯ�� ���� ��Ȳ�̸� ��� ������ �½��ϴ�.
                 if (instance != null) GameObject.Destroy(instance);
             }
         }
 
         /// <summary>
-        /// ���׸� Ǯ �ν��Ͻ��� ��ȯ�ϰ�, Ǯ�� ������ �ݹ鸸 ȣ���մϴ�.
+        /// Returns a generic instance to the pool, or fires its OnReturnToPool callback
+        /// if the pool no longer exists.
         /// </summary>
         public static IGenericPoolInfoReadOnly ReturnGeneric<T>(T instance) where T : class, IPoolGeneric, new()
         {
             if (HasPool == true)
-            {
                 return s_objectPool.GenericReturn(instance);
-            }
 
             if (instance != null)
-            {
                 instance.OnReturnToPool();
-            }
+
             return null;
         }
 
         /// <summary>
-        /// ���� �ð� �� ���׸� Ǯ �ν��Ͻ��� ��ȯ�ϰų�, Ǯ�� ������ �ݹ鸸 ȣ���մϴ�.
+        /// Returns a generic instance to the pool after a delay, or fires its callback immediately
+        /// if the pool no longer exists.
         /// </summary>
         public static void ReturnGeneric<T>(T instance, float delay) where T : class, IPoolGeneric, new()
         {
@@ -264,24 +212,17 @@ namespace AutoPool_Tool
                 return;
             }
             if (instance != null)
-            {
                 instance.OnReturnToPool();
-            }
         }
 
-        /// <summary>
-        /// ���� Ǯ �ν��Ͻ��� �����մϴ�. �̹� �����ϸ� �ƹ� ���۵� ���� �ʽ��ϴ�.
-        /// </summary>
         private static void CreatePool()
         {
             if (s_objectPool == null)
-            {
                 s_objectPool = MainAutoPool.CreatePool();
-            }
         }
 
         /// <summary>
-        /// �� �ε� �� ��Ÿ�� �ʱ�ȭ �� Ǯ �ν��Ͻ��� �ʱ� ���·� �����մϴ�.
+        /// Resets the pool reference before each scene load so a fresh instance is created.
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void SetRunTime()

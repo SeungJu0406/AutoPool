@@ -3,25 +3,20 @@ using UnityEngine;
 namespace AutoPool_Tool
 {
     /// <summary>
-    /// Unity Resources 경로 기반으로 풀에서 객체를 가져오는 전용 핸들러입니다.
+    /// Handles Get requests for pools backed by Unity Resources-loaded prefabs.
     /// </summary>
     public class AutoPoolResourcesGetHandler
     {
         AutoPoolGetHandler _getHandler;
         MainAutoPool _autoPool;
 
-        /// <summary>
-        /// Resources Get 처리를 위해 상위 Get 핸들러와 메인 풀을 주입합니다.
-        /// </summary>
         public AutoPoolResourcesGetHandler(AutoPoolGetHandler getHandler, MainAutoPool autoPool)
         {
             _getHandler = getHandler;
             _autoPool = autoPool;
         }
 
-        /// <summary>
-        /// Resources 경로 기반 GameObject 인스턴스를 풀에서 가져옵니다.
-        /// </summary>
+        /// <summary>Retrieves a GameObject from the Resources pool.</summary>
         public GameObject ResourcesGet(string resources)
         {
             PoolInfo info = _autoPool.FindResourcesPool(resources);
@@ -29,9 +24,7 @@ namespace AutoPool_Tool
             return instance;
         }
 
-        /// <summary>
-        /// Resources 경로 기반 GameObject 인스턴스를 가져와 지정된 트랜스폼에 배치합니다.
-        /// </summary>
+        /// <summary>Retrieves a Resources-path GameObject and parents it under <paramref name="transform"/>.</summary>
         public GameObject ResourcesGet(string resources, Transform transform, bool worldPositionStay = false)
         {
             PoolInfo info = _autoPool.FindResourcesPool(resources);
@@ -39,9 +32,7 @@ namespace AutoPool_Tool
             return instance;
         }
 
-        /// <summary>
-        /// Resources 경로 기반 GameObject 인스턴스를 가져와 위치와 회전을 설정합니다.
-        /// </summary>
+        /// <summary>Retrieves a Resources-path GameObject at the given position and rotation.</summary>
         public GameObject ResourcesGet(string resources, Vector3 pos, Quaternion rot)
         {
             PoolInfo info = _autoPool.FindResourcesPool(resources);
@@ -49,9 +40,7 @@ namespace AutoPool_Tool
             return instance;
         }
 
-        /// <summary>
-        /// Resources 경로 기반 컴포넌트 인스턴스를 풀에서 가져옵니다.
-        /// </summary>
+        /// <summary>Retrieves a Component from the Resources pool.</summary>
         public T ResourcesGet<T>(string resources) where T : Component
         {
             PoolInfo info = _autoPool.FindResourcesPool(resources);
@@ -60,9 +49,7 @@ namespace AutoPool_Tool
             return component;
         }
 
-        /// <summary>
-        /// Resources 경로 기반 컴포넌트 인스턴스를 가져와 지정된 트랜스폼에 배치합니다.
-        /// </summary>
+        /// <summary>Retrieves a Resources-path Component and parents it under <paramref name="transform"/>.</summary>
         public T ResourcesGet<T>(string resources, Transform transform, bool worldPositionStay = false) where T : Component
         {
             PoolInfo info = _autoPool.FindResourcesPool(resources);
@@ -71,9 +58,7 @@ namespace AutoPool_Tool
             return component;
         }
 
-        /// <summary>
-        /// Resources 경로 기반 컴포넌트 인스턴스를 가져와 위치와 회전을 설정합니다.
-        /// </summary>
+        /// <summary>Retrieves a Resources-path Component at the given position and rotation.</summary>
         public T ResourcesGet<T>(string resources, Vector3 pos, Quaternion rot) where T : Component
         {
             PoolInfo info = _autoPool.FindResourcesPool(resources);
