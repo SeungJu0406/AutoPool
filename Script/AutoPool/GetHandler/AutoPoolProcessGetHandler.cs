@@ -4,16 +4,14 @@ using UnityEngine.SceneManagement;
 namespace AutoPool_Tool
 {
     /// <summary>
-    /// ���� Ǯ���� ��ü�� �����ų� ���� ������ ��ġ/ȸ��/�θ� �������� ó���ϴ� Get ���μ��� �ڵ鷯�Դϴ�.
+    /// Low-level handler that pops an instance from the pool stack (or instantiates a new one),
+    /// then applies position, rotation, parent, and activation.
     /// </summary>
     public class AutoPoolProcessGetHandler
     {
         AutoPoolGetHandler _getHandler;
         MainAutoPool _autoPool;
 
-        /// <summary>
-        /// ���� Ǯ�� ���� Get �ڵ鷯�� ���Թ޾� �ʱ�ȭ�մϴ�.
-        /// </summary>
         public AutoPoolProcessGetHandler(AutoPoolGetHandler getHandler, MainAutoPool autoPool)
         {
             _getHandler = getHandler;
@@ -21,159 +19,145 @@ namespace AutoPool_Tool
         }
 
         /// <summary>
-        /// ��ġ/ȸ�� �⺻��(Zero/Identity)���� GameObject�� �����ɴϴ�.
+        /// Pops a pooled instance and activates it at world origin, or instantiates a new one
+        /// if the pool is empty.
         /// </summary>
         public GameObject ProcessGet(PoolInfo info)
         {
             GameObject instance = null;
             PooledObject poolObject = null;
 
-            if (_autoPool.FindObject(info))                            // 1) Ǯ�� ��ȿ�� �ν��Ͻ��� �ִ��� �˻�
+            if (_autoPool.FindObject(info))
             {
-                instance = info.Pool.Pop();                            // 2) ���ÿ��� �ϳ� ����
+                instance = info.Pool.Pop();
+                poolObject = instance.GetComponent<PooledObject>();
+                _autoPool.WakeUpRigidBody(poolObject);
 
-                poolObject = instance.GetComponent<PooledObject>();    // 3) PooledObject ����
-                _autoPool.WakeUpRigidBody(poolObject);                 // 4) Rigidbody/2D �����
-
-                instance.transform.position = Vector3.zero;            // 5) ��ġ �ʱ�ȭ
-                instance.transform.rotation = Quaternion.identity;     // 6) ȸ�� �ʱ�ȭ
-                instance.transform.localScale = info.Prefab.transform.localScale; // 7) ��ĸ�� �ʱ�ȭ
-                instance.transform.SetParent(null);                    // 8) �θ� ���� (��Ʈ�� �̵�)
-                instance.gameObject.SetActive(true);                   // 8) Ȱ��ȭ
-                SceneManager.MoveGameObjectToScene(                    // 9) ���� Ȱ�� ������ �̵�
-                    instance,
-                    SceneManager.GetActiveScene());
+                instance.transform.position = Vector3.zero;
+                instance.transform.rotation = Quaternion.identity;
+                instance.transform.localScale = info.Prefab.transform.localScale;
+                instance.transform.SetParent(null);
+                instance.gameObject.SetActive(true);
+                SceneManager.MoveGameObjectToScene(instance, SceneManager.GetActiveScene());
             }
             else
             {
-                instance = GameObject.Instantiate(info.Prefab);        // 1) Ǯ�� ������ �� �ν��Ͻ� ����
-                poolObject = _autoPool.AddPoolObjectComponent(instance, info); // 2) Ǯ ������ ������Ʈ ����
+                instance = GameObject.Instantiate(info.Prefab);
+                poolObject = _autoPool.AddPoolObjectComponent(instance, info);
             }
 
-            poolObject.OnCreateFromPool();                             // 10) OnCreateFromPool �ݹ� ����
-            SetActiveCount(info);                                      // 11) Ȱ��/Ǯ ī��Ʈ ����ȭ
+            poolObject.OnCreateFromPool();
+            SetActiveCount(info);
             return instance;
         }
 
         /// <summary>
-        /// ������ Ʈ�������� �������� GameObject�� �����ɴϴ�.
+        /// Pops a pooled instance and places it under <paramref name="transform"/>,
+        /// or instantiates a new one via Unity's Instantiate overload.
         /// </summary>
         public GameObject ProcessGet(PoolInfo info, Transform transform, bool worldPositionStay = false)
         {
             GameObject instance = null;
             PooledObject poolObject = null;
 
-            if (_autoPool.FindObject(info))                            // 1) Ǯ�� ��ȿ�� �ν��Ͻ��� �ִ��� �˻�
+            if (_autoPool.FindObject(info))
             {
-                instance = info.Pool.Pop();                            // 2) ���ÿ��� �ϳ� ����
-                poolObject = instance.GetComponent<PooledObject>();    // 3) PooledObject ����
+                instance = info.Pool.Pop();
+                poolObject = instance.GetComponent<PooledObject>();
+                _autoPool.WakeUpRigidBody(poolObject);
 
-                _autoPool.WakeUpRigidBody(poolObject);                 // 4) Rigidbody/2D �����
-                instance.transform.SetParent(transform, worldPositionStay); // 5) worldPositionStay ����踦 Unity ǥ�� ���ǿ� ����
+                instance.transform.SetParent(transform, worldPositionStay);
                 if (!worldPositionStay)
-                    instance.transform.localScale = info.Prefab.transform.localScale; // 6) ��ĸ�� �ʱ�ȭ
+                    instance.transform.localScale = info.Prefab.transform.localScale;
 
-                instance.gameObject.SetActive(true);                   // 7) Ȱ��ȭ
+                instance.gameObject.SetActive(true);
             }
             else
             {
-                instance = GameObject.Instantiate(                     // 1) Unity �⺻ Instantiate API ���
-                    info.Prefab,
-                    transform,
-                    worldPositionStay);
-                poolObject = _autoPool.AddPoolObjectComponent(instance, info); // 2) Ǯ ������ ������Ʈ ����
+                instance = GameObject.Instantiate(info.Prefab, transform, worldPositionStay);
+                poolObject = _autoPool.AddPoolObjectComponent(instance, info);
             }
 
-            poolObject.OnCreateFromPool();                             // 8) OnCreateFromPool �ݹ� ����
-            SetActiveCount(info);                                      // 9) Ȱ��/Ǯ ī��Ʈ ����ȭ
+            poolObject.OnCreateFromPool();
+            SetActiveCount(info);
             return instance;
         }
 
         /// <summary>
-        /// ������ ��ġ�� ȸ������ GameObject�� �����ɴϴ�.
+        /// Pops a pooled instance and places it at the given position and rotation,
+        /// or instantiates a new one.
         /// </summary>
         public GameObject ProcessGet(PoolInfo info, Vector3 pos, Quaternion rot)
         {
             GameObject instance = null;
             PooledObject poolObject = null;
 
-            if (_autoPool.FindObject(info))                            // 1) Ǯ�� ��ȿ�� �ν��Ͻ� �˻�
+            if (_autoPool.FindObject(info))
             {
-                instance = info.Pool.Pop();                            // 2) ���ÿ��� �ϳ� ����
-                poolObject = instance.GetComponent<PooledObject>();    // 3) PooledObject ����
+                instance = info.Pool.Pop();
+                poolObject = instance.GetComponent<PooledObject>();
+                _autoPool.WakeUpRigidBody(poolObject);
 
-                _autoPool.WakeUpRigidBody(poolObject);                 // 4) Rigidbody/2D �����
-                instance.transform.position = pos;                     // 5) ��ġ ����
-                instance.transform.rotation = rot;     
-                instance.transform.localScale = info.Prefab.transform.localScale;                // 6) ȸ�� ����
-                instance.transform.SetParent(null);                    // 7) �θ� ����
-                instance.gameObject.SetActive(true);                   // 8) Ȱ��ȭ
-                SceneManager.MoveGameObjectToScene(                    // 9) ���� Ȱ�� ������ �̵�
-                    instance,
-                    SceneManager.GetActiveScene());
+                instance.transform.position = pos;
+                instance.transform.rotation = rot;
+                instance.transform.localScale = info.Prefab.transform.localScale;
+                instance.transform.SetParent(null);
+                instance.gameObject.SetActive(true);
+                SceneManager.MoveGameObjectToScene(instance, SceneManager.GetActiveScene());
             }
             else
             {
-                instance = GameObject.Instantiate(info.Prefab, pos, rot);        // 1) �� �ν��Ͻ� ����
-                poolObject = _autoPool.AddPoolObjectComponent(instance, info);   // 2) Ǯ ������ ������Ʈ ����
+                instance = GameObject.Instantiate(info.Prefab, pos, rot);
+                poolObject = _autoPool.AddPoolObjectComponent(instance, info);
             }
 
-            poolObject.OnCreateFromPool();                             // 10) OnCreateFromPool �ݹ� ����
-            SetActiveCount(info);                                      // 11) Ȱ��/Ǯ ī��Ʈ ����ȭ
+            poolObject.OnCreateFromPool();
+            SetActiveCount(info);
             return instance;
         }
 
         /// <summary>
-        /// ���׸� Ǯ���� Ÿ�� <typeparamref name="T"/> �ν��Ͻ��� �������ų� ���� �����մϴ�.
+        /// Pops or creates a generic instance of type <typeparamref name="T"/>
+        /// and marks it active in the pool.
         /// </summary>
         public T ProcessGenericGet<T>(GenericPoolInfo poolInfo) where T : class, IPoolGeneric, new()
         {
             T instance = null;
             IPoolGeneric poolGeneric = null;
 
-            if (_autoPool.FindGeneric<T>(poolInfo))                    // 1) ���׸� Ǯ�� ��ȿ�� �ν��Ͻ� �ִ��� �˻�
+            if (_autoPool.FindGeneric<T>(poolInfo))
             {
-                poolGeneric = poolInfo.Pool.Pop();                     // 2) ���ÿ��� ������
-                instance = (T)poolGeneric;                             // 3) ��ü Ÿ������ ĳ����
+                poolGeneric = poolInfo.Pool.Pop();
+                instance = (T)poolGeneric;
             }
             else
             {
-                instance = new T();                                    // 1) �� �ν��Ͻ� ����
-                poolGeneric = (IPoolGeneric)instance;                  // 2) �������̽��� ĳ����
-                poolGeneric.Pool = new PoolGenericInfo();              // 3) ���� ��ü�� PoolGenericInfo ����
-                poolGeneric.Pool.PoolInfo = poolInfo;                  // 4) ���� GenericPoolInfo ����
-                poolInfo.PoolCount++;                                  // 5) Ǯ�� ���� �� ���� ����
-                poolInfo.OnPoolDormant += poolGeneric.OnReturnToPool;  // 6) Ǯ �޸� �� ��ü ��ȯ �ݹ� ����
+                instance = new T();
+                poolGeneric = (IPoolGeneric)instance;
+                poolGeneric.Pool = new PoolGenericInfo();
+                poolGeneric.Pool.PoolInfo = poolInfo;
+                poolInfo.PoolCount++;
+                poolInfo.OnPoolDormant += poolGeneric.OnReturnToPool;
             }
 
-            SetActiveCount(poolInfo);                                  // 7) Ȱ��/Ǯ ī��Ʈ ����ȭ
-            poolGeneric.Pool.IsActive = true;                          // 8) ���� ��ü Ȱ�� �÷��� ����
-            poolGeneric.OnCreateFromPool();                            // 9) OnCreateFromPool �ݹ� ����
+            SetActiveCount(poolInfo);
+            poolGeneric.Pool.IsActive = true;
+            poolGeneric.OnCreateFromPool();
             return instance;
         }
 
-        /// <summary>
-        /// GameObject Ǯ�� Ȱ�� ������ ������Ű�� �ִ� ������ �����մϴ�.
-        /// </summary>
         private void SetActiveCount(PoolInfo info)
         {
             info.ActiveCount++;
             if (info.PoolCount < info.ActiveCount)
-            {
                 info.PoolCount = info.ActiveCount;
-            }
         }
 
-        /// <summary>
-        /// ���׸� Ǯ�� Ȱ�� ������ ������Ű�� �ִ� ������ �����մϴ�.
-        /// </summary>
         private void SetActiveCount(GenericPoolInfo info)
         {
             info.ActiveCount++;
             if (info.PoolCount < info.ActiveCount)
-            {
                 info.PoolCount = info.ActiveCount;
-            }
         }
     }
 }

@@ -4,148 +4,92 @@ using UnityEngine;
 namespace AutoPool_Tool
 {
     /// <summary>
-    /// 프리팹 및 리소스 기반 객체 풀을 관리하고 생성/반환 기능을 제공하는 인터페이스입니다.
+    /// Contract for a pool manager that handles prefab, Resources, and generic object pools.
     /// </summary>
     public interface IObjectPool
     {
-        /// <summary>
-        /// 지정된 프리팹에 대한 풀 정보를 가져옵니다.
-        /// </summary>
+        /// <summary>Returns pool info for the given prefab.</summary>
         IPoolInfoReadOnly GetInfo(GameObject prefab);
 
-        /// <summary>
-        /// 지정된 컴포넌트 프리팹에 대한 풀 정보를 가져옵니다.
-        /// </summary>
+        /// <summary>Returns pool info for the given Component prefab.</summary>
         IPoolInfoReadOnly GetInfo<T>(T prefab) where T : Component;
 
-        /// <summary>
-        /// Resources 경로로 관리되는 풀 정보를 가져옵니다.
-        /// </summary>
+        /// <summary>Returns pool info for a Resources-loaded prefab.</summary>
         IPoolInfoReadOnly GetResourcesInfo(string resources);
 
-        /// <summary>
-        /// 지정된 프리팹에 대해 미리 생성할 객체 수를 설정합니다.
-        /// </summary>
+        /// <summary>Pre-warms the prefab pool to at least <paramref name="count"/> instances.</summary>
         IPoolInfoReadOnly SetPreload(GameObject prefab, int count);
 
-        /// <summary>
-        /// 지정된 컴포넌트 프리팹에 대해 미리 생성할 객체 수를 설정합니다.
-        /// </summary>
+        /// <summary>Pre-warms the Component prefab pool to at least <paramref name="count"/> instances.</summary>
         IPoolInfoReadOnly SetPreload<T>(T prefab, int count) where T : Component;
 
-        /// <summary>
-        /// Resources 경로로 로드되는 객체에 대해 미리 생성할 수를 설정합니다.
-        /// </summary>
+        /// <summary>Pre-warms the Resources-path pool to at least <paramref name="count"/> instances.</summary>
         IPoolInfoReadOnly SetResourcesPreload(string resources, int count);
 
-        /// <summary>
-        /// 지정된 프리팹과 연결된 풀을 모두 비웁니다.
-        /// </summary>
+        /// <summary>Destroys all pooled instances for the given prefab.</summary>
         IPoolInfoReadOnly ClearPool(GameObject prefab);
 
-        /// <summary>
-        /// 지정된 컴포넌트 프리팹과 연결된 풀을 모두 비웁니다.
-        /// </summary>
+        /// <summary>Destroys all pooled instances for the given Component prefab.</summary>
         IPoolInfoReadOnly ClearPool<T>(T prefab) where T : Component;
 
-        /// <summary>
-        /// 지정된 Resources 경로와 연결된 풀을 모두 비웁니다.
-        /// </summary>
+        /// <summary>Destroys all pooled instances for the given Resources path.</summary>
         IPoolInfoReadOnly ClearResourcesPool(string resources);
 
-        /// <summary>
-        /// 프리팹을 기반으로 풀에서 GameObject 인스턴스를 가져옵니다.
-        /// </summary>
+        /// <summary>Retrieves a GameObject instance from the pool.</summary>
         GameObject Get(GameObject prefab);
 
-        /// <summary>
-        /// 프리팹을 기반으로 풀에서 인스턴스를 가져와 지정된 트랜스폼에 배치합니다.
-        /// </summary>
+        /// <summary>Retrieves a GameObject instance and parents it under <paramref name="transform"/>.</summary>
         GameObject Get(GameObject prefab, Transform transform, bool worldPositionStay);
 
-        /// <summary>
-        /// 프리팹을 기반으로 풀에서 인스턴스를 가져와 지정된 위치와 회전에 배치합니다.
-        /// </summary>
+        /// <summary>Retrieves a GameObject instance and places it at the given position and rotation.</summary>
         GameObject Get(GameObject prefab, Vector3 pos, Quaternion rot);
 
-        /// <summary>
-        /// 컴포넌트 프리팹을 기반으로 풀에서 인스턴스를 가져옵니다.
-        /// </summary>
+        /// <summary>Retrieves a Component instance from the pool.</summary>
         T Get<T>(T prefab) where T : Component;
 
-        /// <summary>
-        /// 컴포넌트 프리팹을 기반으로 풀에서 인스턴스를 가져와 지정된 트랜스폼에 배치합니다.
-        /// </summary>
+        /// <summary>Retrieves a Component instance and parents it under <paramref name="transform"/>.</summary>
         T Get<T>(T prefab, Transform transform, bool worldPositionStay) where T : Component;
 
-        /// <summary>
-        /// 컴포넌트 프리팹을 기반으로 풀에서 인스턴스를 가져와 지정된 위치와 회전에 배치합니다.
-        /// </summary>
+        /// <summary>Retrieves a Component instance and places it at the given position and rotation.</summary>
         T Get<T>(T prefab, Vector3 pos, Quaternion rot) where T : Component;
 
-        /// <summary>
-        /// Resources 경로를 사용하여 풀에서 GameObject 인스턴스를 가져옵니다.
-        /// </summary>
+        /// <summary>Retrieves a GameObject from the Resources-path pool.</summary>
         GameObject ResourcesGet(string resouces);
 
-        /// <summary>
-        /// Resources 경로를 사용하여 인스턴스를 가져와 지정된 트랜스폼에 배치합니다.
-        /// </summary>
+        /// <summary>Retrieves a Resources-path GameObject and parents it under <paramref name="transform"/>.</summary>
         GameObject ResourcesGet(string resouces, Transform transform, bool worldPositionStay);
 
-        /// <summary>
-        /// Resources 경로를 사용하여 인스턴스를 가져와 지정된 위치와 회전에 배치합니다.
-        /// </summary>
+        /// <summary>Retrieves a Resources-path GameObject at the given position and rotation.</summary>
         GameObject ResourcesGet(string resouces, Vector3 pos, Quaternion rot);
 
-        /// <summary>
-        /// Resources 경로를 사용하여 컴포넌트 인스턴스를 풀에서 가져옵니다.
-        /// </summary>
+        /// <summary>Retrieves a Component from the Resources-path pool.</summary>
         T ResourcesGet<T>(string resouces) where T : Component;
 
-        /// <summary>
-        /// Resources 경로를 사용하여 컴포넌트 인스턴스를 가져와 지정된 트랜스폼에 배치합니다.
-        /// </summary>
+        /// <summary>Retrieves a Resources-path Component and parents it under <paramref name="transform"/>.</summary>
         T ResourcesGet<T>(string resouces, Transform transform, bool worldPositionStay) where T : Component;
 
-        /// <summary>
-        /// Resources 경로를 사용하여 컴포넌트 인스턴스를 가져와 지정된 위치와 회전에 배치합니다.
-        /// </summary>
+        /// <summary>Retrieves a Resources-path Component at the given position and rotation.</summary>
         T ResourcesGet<T>(string resouces, Vector3 pos, Quaternion rot) where T : Component;
 
-        /// <summary>
-        /// 제네릭 풀에서 타입 <typeparamref name="T"/> 인스턴스를 가져옵니다.
-        /// </summary>
+        /// <summary>Retrieves a generic pool instance of type <typeparamref name="T"/>.</summary>
         T GenericPool<T>() where T : class, IPoolGeneric, new();
 
-        /// <summary>
-        /// GameObject 인스턴스를 풀에 반환합니다.
-        /// </summary>
+        /// <summary>Returns a GameObject instance to the pool.</summary>
         IPoolInfoReadOnly Return(GameObject instance);
 
-        /// <summary>
-        /// 컴포넌트 인스턴스를 풀에 반환합니다.
-        /// </summary>
+        /// <summary>Returns a Component instance to the pool.</summary>
         IPoolInfoReadOnly Return<T>(T instance) where T : Component;
 
-        /// <summary>
-        /// 지정된 지연 시간 후 GameObject 인스턴스를 풀에 반환합니다.
-        /// </summary>
+        /// <summary>Returns a GameObject instance to the pool after a delay.</summary>
         void Return(GameObject instance, float delay);
 
-        /// <summary>
-        /// 지정된 지연 시간 후 컴포넌트 인스턴스를 풀에 반환합니다.
-        /// </summary>
+        /// <summary>Returns a Component instance to the pool after a delay.</summary>
         void Return<T>(T instance, float delay) where T : Component;
 
-        /// <summary>
-        /// 제네릭 풀 인스턴스를 반환하고 해당 풀 정보를 가져옵니다.
-        /// </summary>
+        /// <summary>Returns a generic pool instance and provides updated pool info.</summary>
         IGenericPoolInfoReadOnly GenericReturn<T>(T instance) where T : class, IPoolGeneric, new();
 
-        /// <summary>
-        /// 지정된 지연 시간 후 제네릭 풀 인스턴스를 반환합니다.
-        /// </summary>
+        /// <summary>Returns a generic pool instance after a delay.</summary>
         void GenericReturn<T>(T instance, float delay) where T : class, IPoolGeneric, new();
     }
 }
